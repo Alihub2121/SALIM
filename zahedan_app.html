@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>سامانه پیشرفته و جامع ژئومارکتینگ املاک زاهدان | VisionPro</title>
+    
+    <!-- بهینه‌سازی لود فایل‌های خارجی برای گوشی -->
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #1abc9c;
+            --dark: #1a252f;
+            --light: #f8f9fa;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --radius: 10px;
+            --shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        * { box-sizing: border-box; font-family: Segoe UI, Tahoma, sans-serif; margin: 0; padding: 0; }
+        body { background-color: #f1f2f6; color: var(--dark); font-size: 13px; }
+        header { background: var(--primary); color: white; padding: 14px; text-align: center; font-weight: bold; font-size: 16px; box-shadow: var(--shadow); }
+
+        /* بهینه‌سازی نوار تب‌ها برای تاچ گوشی */
+        .tabs-nav { display: flex; overflow-x: auto; background: white; box-shadow: var(--shadow); padding: 6px; gap: 6px; position: sticky; top: 0; z-index: 1000; -webkit-overflow-scrolling: touch; }
+        .tab-btn { background: none; color: #7f8c8d; border: none; padding: 12px 18px; cursor: pointer; border-radius: var(--radius); font-weight: bold; white-space: nowrap; font-size: 12px; transition: all 0.2s; min-height: 44px; touch-action: manipulation; }
+        .tab-btn.active { background: var(--accent); color: white; }
+        .tab-btn:hover { background: #edf2f7; color: var(--primary); }
+
+        .container { padding: 15px; max-width: 1500px; margin: 0 auto; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* اصلاح ساختار گرید برای گوشی و دسکتاپ */
+        .grid-layout { display: flex; flex-direction: column; gap: 15px; }
+        .map-and-zone-side { order: -1; } /* در گوشی نقشه و زون اول نمایش داده می‌شود */
+        
+        @media(min-width: 992px) { 
+            .grid-layout { display: grid; grid-template-columns: 480px 1fr; } 
+            .map-and-zone-side { order: unset; }
+        }
+
+        .card { background: white; border-radius: var(--radius); padding: 15px; box-shadow: var(--shadow); margin-bottom: 12px; border: 1px solid #e2e8f0; }
+        .card h3 { margin-bottom: 12px; font-size: 14px; color: var(--primary); border-bottom: 2px solid var(--light); padding-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+
+        .form-group { margin-bottom: 10px; }
+        label { display: block; margin-bottom: 4px; font-weight: bold; font-size: 11px; color: #4a5568; }
+        
+        /* بهینه‌سازی فیلدها برای تایپ راحت در موبایل */
+        input, select, textarea { width: 100%; padding: 8px 10px; border: 1.5px solid #dcdde1; border-radius: 6px; background: var(--light); font-size: 12px; color: var(--dark); min-height: 40px; }
+        input[type="color"] { padding: 2px 5px; height: 40px; cursor: pointer; }
+        input:focus, select:focus, textarea:focus { border-color: var(--accent); outline: none; background: white; box-shadow: 0 0 0 3px rgba(26,188,156,0.1); }
+        
+        .flex-box { display: flex; gap: 8px; margin-bottom: 5px; flex-wrap: wrap; }
+        @media(min-width: 400px) { .flex-box { flex-wrap: nowrap; } }
+
+        /* بهینه‌سازی دکمه‌ها برای تاچ */
+        .btn { background: var(--accent); color: white; border: none; padding: 10px; width: 100%; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; text-align: center; transition: background 0.2s; min-height: 44px; touch-action: manipulation; display: flex; align-items: center; justify-content: center; }
+        .btn:hover { opacity: 0.9; }
+        .btn-success { background: var(--success); }
+        .btn-danger { background: var(--danger); }
+
+        /* ارتفاع داینامیک نقشه برای گوشی */
+        .map-wrapper { height: 50vh; min-height: 350px; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); position: relative; border: 2px solid var(--primary); margin-bottom: 15px; }
+        @media(min-width: 992px) { .map-wrapper { height: 60vh; position: sticky; top: 15px; } }
+        #map { width: 100%; height: 100%; z-index: 1; }
+
+        .dynamic-section { display: none; background: #fafbfc; border: 1px dashed var(--accent); padding: 12px; border-radius: 6px; margin-top: 10px; }
+        
+        .commons-box { background: #ebf5fb; padding: 10px; border-radius: 6px; margin-top: 8px; border: 1px solid #aed6f1; }
+        .commons-box p { font-weight: bold; margin-bottom: 6px; color: #2e4053; font-size: 11px; }
+
+        .checkbox-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+        @media(min-width: 400px) { .checkbox-grid { grid-template-columns: repeat(3, 1fr); } }
+        .checkbox-grid label { display: flex; align-items: center; gap: 4px; font-weight: normal; cursor: pointer; font-size: 11px; background: white; padding: 8px 4px; border-radius: 4px; border: 1px solid #edf2f7; min-height: 35px;}
+        .checkbox-grid input { width: auto; cursor: pointer; min-height: unset; margin:0;}
+
+        table { width: 100%; border-collapse: collapse; margin-top: 8px; background: white; box-shadow: var(--shadow); border-radius: var(--radius); overflow: hidden; }
+        th, td { padding: 10px; text-align: right; border-bottom: 1px solid #edf2f7; font-size: 12px; }
+        th { background: var(--primary); color: white; }
+        tr:hover { background-color: #f8f9fa; }
+        
+        .hunt-card { border-right: 5px solid var(--danger); background: #fff5f5; padding: 12px; border-radius: 6px; margin-bottom: 10px; box-shadow: var(--shadow); }
+    </style>
+</head>
+<body>
+
+<header>سامانه پیشرفته ژئومارکتینگ، ماتریس تهاتر و مدیریت مکانی املاک زاهدان | VisionPro</header>
+
+<div class="tabs-nav">
+    <button class="tab-btn active" onclick="openTab('tab1')">🗺️ نقشه و ثبت فایل</button>
+    <button class="tab-btn" onclick="openTab('tab2')">👥 متقاضیان & تطبیق</button>
+    <button class="tab-btn" onclick="openTab('tab3')">🚀 رادار شکار فرصت‌ها</button>
+    <button class="tab-btn" onclick="openTab('tab4')">🏢 کارنامه سازندگان & تهاتر</button>
+    <button class="tab-btn" onclick="openTab('tab5')">🧮 ماشین‌حساب تخصصی بازار</button>
+</div>
+
+<div class="container">
+    
+    <div id="tab1" class="tab-content active">
+        <div class="grid-layout">
+            
+            <!-- بخش فرم مشخصات ملک (سمت راست در دسکتاپ، پایین در موبایل) -->
+            <div class="property-form-side">
+                <div class="card">
+                    <h3>📋 فرم هوشمند کارشناسی و ثبت فایل</h3>
+                    
+                    <div class="form-group">
+                        <label>انتخاب دقیق سبک فایل:</label>
+                        <select id="p_type" onchange="toggleFormFields()">
+                            <option value="زمین">۱. زمین (Land)</option>
+                            <option value="کلنگی">۲. کلنگی (Old Property)</option>
+                            <option value="پیش‌فروش">۳. پیش‌فروش (Pre-Sale)</option>
+                            <option value="خام">۴. خام (Shell Unit)</option>
+                            <option value="فول">۵. فول آپشن (Full Option)</option>
+                            <option value="ویلایی">۶. ویلایی (Villa)</option>
+                            <option value="نوساز">۷. نوساز (New Built)</option>
+                            <option value="کهنه‌ساز">۸. کهنه‌ساز (Old Built)</option>
+                            <option value="پنت‌هوس">۹. پنت‌هوس و مستر لوکس (Penthouse)</option>
+                        </select>
+                    </div>
+
+                    <div class="flex-box">
+                        <div class="form-group" style="flex:1;"><label>نام مالک / سازنده:</label><input type="text" id="p_owner_name" placeholder="آقای/خانم..."></div>
+                        <div class="form-group" style="flex:1;"><label>تلفن تماس مستقیم:</label><input type="text" id="p_phone" placeholder="0915"></div>
+                    </div>
+
+                    <div class="flex-box">
+                        <div class="form-group" style="flex:1;"><label>متراژ کل (متر مربع):</label><input type="number" id="p_area"></div>
+                        <div class="form-group" style="flex:1;"><label>قیمت کل امضا (میلیارد تومان):</label><input type="number" id="p_price" step="0.01"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>جهت ملک / موقعیت بنا:</label>
+                        <select id="p_dir"><option>شمالی</option><option>جنوبی</option><option>دو کله</option><option>بر اصلی خیابان/کوچه</option></select>
+                    </div>
+<div class="card">
+    <h3>📸 تصاویر ملک</h3>
+    <input type="file" id="p_images" accept="image/*" multiple onchange="previewImages()">
+    <div id="image-preview" style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;"></div>
+</div>
+                    <div id="sec_زمین" class="dynamic-section" style="display:block;">
+                        <div class="commons-box">
+                            <p>📐 مشخصات و نوع سند زمین:</p>
+                            <div class="checkbox-grid">
+                                <label><input type="checkbox" class="comm-check" value="سند تک‌برگ ملکی"> سند تک‌برگ ملکی</label>
+                                <label><input type="checkbox" class="comm-check" value="سند آستانه"> سند آستانه</label>
+                                <label><input type="checkbox" class="comm-check" value="کاربری مسکونی"> کاربری مسکونی</label>
+                                <label><input type="checkbox" class="comm-check" value="کاربری تجاری"> کاربری تجاری</label>
+                                <label><input type="checkbox" class="comm-check" value="تراکم ۴ طبقه"> تراکم ۴ طبقه</label>
+                                <label><input type="checkbox" class="comm-check" value="تراکم ۵ طبقه و بالاتر"> تراکم ۵ طبقه +</label>
+                                <label><input type="checkbox" class="comm-check" value="حصارکشی شده"> حصارکشی شده</label>
+                                <label><input type="checkbox" class="comm-check" value="زمین دوکله"> موقعیت دوکله</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="sec_کلنگی" class="dynamic-section">
+                        <div class="commons-box">
+                            <p>🏗️ وضعیت و امتیازات ملک کلنگی:</p>
+                            <div class="checkbox-grid">
+                                <label><input type="checkbox" class="comm-check" value="تک مالک"> تک مالک (بدون ورثه)</label>
+                                <label><input type="checkbox" class="comm-check" value="آماده مشارکت"> حاضر به مشارکت در ساخت</label>
+                                <label><input type="checkbox" class="comm-check" value="ملک تخلیه"> ملک کاملاً تخلیه است</label>
+                                <label><input type="checkbox" class="comm-check" value="انشعابات کامل فعال"> انشعابات آب/برق/گاز فعال</label>
+                                <label><input type="checkbox" class="comm-check" value="دارای دستور نقشه جدید"> دارای دستور نقشه جدید</label>
+                                <label><input type="checkbox" class="comm-check" value="سند شش دانگ بدون ریشه"> سند ۶ دانگ بدون ریشه</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="sec_پیش‌فروش" class="dynamic-section">
+                        <div class="commons-box">
+                            <p>🏗️ مرحله ساخت و تعهدات قرارداد پیش‌فروش:</p>
+                            <div class="checkbox-grid">
+                                <label><input type="checkbox" class="comm-check" value="مرحله خاکبرداری/فونداسیون"> خاکبرداری/فونداسیون</label>
+                                <label><input type="checkbox" class="comm-check" value="مرحله سفت‌کاری و اسکلت"> سفت‌کاری و اسکلت</label>
+                                <label><input type="checkbox" class="comm-check" value="مرحله نازک‌کاری"> مرحله نازک‌کاری</label>
+                                <label><input type="checkbox" class="comm-check" value="دارای ضرر دیرکرد روزانه"> تعهد ضرر دیرکرد روزانه</label>
+                                <label><input type="checkbox" class="comm-check" value="قرارداد هولوگرام دار"> قرارداد هولوگرام دار ملکی</label>
+                                <label><input type="checkbox" class="comm-check" value="سازنده بنام منطقه"> سازنده بنام و معتبر</label>
+                            </div>
+                        </div>
+                        <div class="commons-box" style="background:#e8f8f5; border-color:#a3e4d7;">
+                            <p>🏢 مشاعات تعهد شده در سند آینده:</p>
+                            <div class="checkbox-grid">
+                                <label><input type="checkbox" class="comm-check" value="پارکینگ سندی اختصاصی"> پارکینگ سندی اختصاصی</label>
+                                <label><input type="checkbox" class="comm-check" value="آسانسور فعال"> آسانسور فعال برند</label>
+                                <label><input type="checkbox" class="comm-check" value="انباری اختصاصی"> انباری اختصاصی</label>
+                                <label><input type="checkbox" class="comm-check" value="سیستم اطفاء حریق"> سیستم اطفاء حریق</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="sec_خام" class="dynamic-section">
+                        <div class="commons-box">
+                            <p>🛠️ وضعیت تحویلی واحد خام (سفید):</p>
+                            <div class="checkbox-grid">
+                                <label><input type="checkbox" class="comm-check" value="کف سرامیک کامل"> کف سرامیک شده</label>
+                                <label><input type="checkbox" class="comm-check" value="دیوار سفیدکاری شده"> دیوار سفیدکاری شده</label>
+                                <label><input type="checkbox" class="comm-check" value="پنجره دوجداره UPVC"> پنجره دوجداره UPVC</label>
+                                <label><input type="checkbox" class="comm-check" value="درب ضد سرقت نصب"> درب ضد سرقت نصب شده</label>
+                                <label><input type="checkbox" class="comm-check" value="لوله‌کشی توکار نیوپایپ"> لوله‌کشی توکار نیوپایپ</label>
+                                <label><input type="checkbox" class="comm-check" value="سیم‌کشی استاندارد کامل"> سیم‌کشی کامل استاندارد</label>
+                            </div>
+                        </div>
+                        <div class="commons-box" style="background:#e8f8f5; border-color:#a3e4d7;">
+                            <p>🏢 مشاعات اصلی ساختمان آپارتمان خام:</p>
+                            <div class="checkbox-grid">
+                                <label><input type="checkbox" class="comm-check" value="پارکینگ اختصاصی باکس"> پارکینگ اختصاصی باکس</label>
+                                <label><input type="checkbox" class="comm-check" value="آسانسور تمام استیل"> آسانسور تمام استیل</label>
+                                <label><input type="checkbox" class="comm-check" value="انباری سندی"> انباری سندی دارد</label>
+                                <label><input type="checkbox" class="comm-check" value="نما سنگ رومی/کلاسیک"> نما سنگ رومی/کلاسیک</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="sec_فول" class="dynamic-section">
+                        <div class="commons-box">
+                            <p>💎 نصبیات لوکس و تزیینات داخلی واحد:</p>
+                            <div class="checkbox-grid">
+                                <label><input type="checkbox" class="comm-check" value="کابینت ممبران لوکس"> کابینت ممبران لوکس</label>
+                                <label><input type="checkbox" class="comm-check" value="کابینت های‌گلاس برند"> کابینت های‌گلاس برند</label>
+                                <label><input type="checkbox" class="comm-check" value="گاز رومیزی و هود توکار"> گاز رومیزی و هود توکار</label>
+                                <label><input type="checkbox" class="comm-check" value="کناف و نور خطی مدرن"> کناف و نور خطی مدرن</label>
+                                <label><input type="checkbox" class="comm-check" value="کاغذ دیواری ترک قابل شستشو"> کاغذدیواری ترک درجه ۱</label>
+                                <label><input type="checkbox" class="comm-check" value="لوسترهای کریستالی نصب"> لوسترهای کریستالی نصب شده</label>
+                                <label><input type="checkbox" class="comm-check" value="شیرآلات توکار درجه یک"> شیرآلات توکار درجه یک</label>
+                                <label><input type="checkbox" class="comm-check" value="اسپلیت و کولرگازی"> اسپلیت و کولرگازی</label>
+                                <label><input type="checkbox" class="comm-check" value="پکیج و رادیاتور نصب"> پکیج و رادیاتور نصب</label>
+                                <label><input type="checkbox" class="comm-check" value="توالت فرنگی وال‌هنگ"> فرنگی وال‌هنگ</label>
+                                <label><input type="checkbox" class="comm-check" value="آینه‌کاری دکوراتیو"> آینه‌کاری دکوراتیو</label>
+                                <label><input type="checkbox" class="comm-check" value="پوستر ۳بعدی تی‌وی‌وال"> پوستر ۳بعدی TV-Wall</label>
+                            </div>
+                        </div>
+                        <div class="commons-box" style="background:#e8f8f5; border-color:#a3e4d7;">
+                            <p>🏢 مشاعات ساختمان فول آپشن:</p>
+                            <div class="checkbox-grid">
+                                <label><input type="checkbox" class="comm-check" value="پارکینگ اختصاصی سندی"> پارکینگ اختصاصی سندی</label>
+                                <label><input type="checkbox" class="comm-check" value="آسانسور اتومات لوکس"> آسانسور اتومات لوکس</label>
+                                <label><input type="checkbox" class="comm-check" value="انباری سندی مستقل"> انباری سندی مستقل</label>
+                                <label><input type="checkbox" class="comm-check" value="دوربین مداربسته حفاظتی"> دوربین مداربسته حفاظتی</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="sec_ویلایی" class="dynamic-section">
+                        <div class="commons-box">
+                            <p>🏡 امکانات تفریحی, حیاط و ساختار ملک ویلایی:</p>
+                            <div class="checkbox-grid">
+                                <label><input type="checkbox" class="comm-check" value="حیاط بزرگ مشجر"> حیاط بزرگ و سرسبز</label>
+                                <label><input type="checkbox" class="comm-check" value="باربیکیو و آلاچیق مدرن"> باربیکیو و آلاچیق مدرن</label>
+                                <label><input type="checkbox" class="comm-check" value="آب‌نمای سنگی در حیاط"> آب‌نمای سنگی کار شده</label>
+                                <label><input type="checkbox" class="comm-check" value="استخر روباز اختصاصی"> استخر روباز اختصاصی</label>
+                                <label><input type="checkbox" class="comm-check" value="پارکینگ حیاط با ظرفیت بالا"> پارکینگ حیاط (+۲ خودرو)</label>
+                                <label><input type="checkbox" class="comm-check" value="چاه آب اختصاصی مجاز"> چاه آب اختصاصی مجاز</label>
+                                <label><input type="checkbox" class="comm-check" value="بنای دوبلکس اعیانی"> بنای دوبلکس اعیانی</label>
+                                <label><input type="checkbox" class="comm-check" value="بنای تریبلکس مجلل"> بنای تریبلکس مجلل</label>
+                                <label><input type="checkbox" class="comm-check" value="طبقات مجزا با راه جدا"> طبقات مجزا با راه جدا</label>
+                                <label><input type="checkbox" class="comm-check" value="شاه‌نشین سنتی در ارتفاع"> شاه‌نشین سنتی مجزا</label>
+                                <label><input type="checkbox" class="comm-check" value="سند تک‌برگ ملکیت قطعی"> سند تک‌برگ ملکیت قطعی</label>
+                                <label><input type="checkbox" class="comm-check" value="سیستم امنیتی و دزدگیر"> سیستم امنیتی و دزدگیر</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="sec_نوساز" class="dynamic-section">
+                        <div class="commons-box">
+                            <p>✨ امکانات داخلی معماری مدرن واحد نوساز:</p>
+                            <div class="checkbox-grid">
+                                <label><input type="checkbox" class="comm-check" value="دارای خواب مستر بزرگ"> دارای خواب مستر (Master)</label>
+                                <label><input type="checkbox" class="comm-check" value="مطبخ کثیف مجزا"> مطبخ کثیف (Dirty Kitchen)</label>
+                                <label><input type="checkbox" class="comm-check" value="اتاق لاندری روم اختصاصی"> لاندری روم (رختشوی‌خانه)</label>
+                                <label><input type="checkbox" class="comm-check" value="پنجره‌های قدی ترمال‌بریک"> پنجره قدی ترمال‌بریک</label>
+                                <label><input type="checkbox" class="comm-check" value="سیستم هوشمند هوش‌برقی BMS"> خانه هوشمند (BMS)</label>
+                                <label><input type="checkbox" class="comm-check" value="تراس بزرگ قابل چیدمان"> تراس بزرگ قابل چیدمان</label>
+                                <label><input type="checkbox" class="comm-check" value="جاروبرقی مرکزی توکار"> جاروبرقی مرکزی توکار</label>
+                                <label><input type="checkbox" class="comm-check" value="سیستم سرمایش داکت اسپلیت"> سیستم داکت اسپلیت</label>
+                            </div>
+                        </div>
+                        <div class="commons-box" style="background:#e8f8f5; border-color:#a3e4d7;">
+                            <p>🏢 مشاعات، تزیینات و وضعیت سند نوساز:</p>
+                            <div class="checkbox-grid">
+                                <label><input type="checkbox" class="comm-check" value="سند تک‌برگ تفکیکی آماده"> سند تک‌برگ تفکیکی آماده</label>
+                                <label><input type="checkbox" class="comm-check" value="پارکینگ اختصاصی بدون مزاحم"> پارکینگ اختصاصی باکس</label>
+                                <label><input type="checkbox" class="comm-check" value="نما رومی تمام سنگ سنگین"> نما رومی تمام سنگ رومی</label>
+                                <label><input type="checkbox" class="comm-check" value="اعلام و اطفاء حریق مهندسی"> اعلام و اطفاء حریق مهندسی</label>
+                                <label><input type="checkbox" class="comm-check" value="مشاعات تمام سنگ درجه یک"> مشاعات کف و دیوار سنگ</label>
+                                <label><input type="checkbox" class="comm-check" value="سرایداری و نگهبانی مقیم"> سرایداری و نگهبانی مقیم</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="sec_کهنه‌ساز" class="dynamic-section">
+                        <div class="commons-box" style="background:#fcf3cf; border-color:#f7dc6f;">
+                            <p>🛠️ وضعیت بازسازی، تزیینات و تغییرات ملک قدیمی:</p>
+                            <div class="checkbox-grid">
+                                <label><input type="checkbox" class="comm-check" value="لوله‌کشی جدید و تعویض شده"> لوله‌کشی تعویض شده</label>
+                                <label><input type="checkbox" class="comm-check" value="سیم‌کشی نوسازی شده"> سیم‌کشی نوسازی شده</label>
+                                <label><input type="checkbox" class="comm-check" value="کف سرامیک/پارکت جدید"> کف سرامیک/پارکت جدید</label>
+                                <label><input type="checkbox" class="comm-check" value="کابینت تعویض شده مدرن"> کابینت تعویض شده مدرن</label>
+                                <label><input type="checkbox" class="comm-check" value="پنجره دوجداره جدید"> پنجره دوجداره شده</label>
+                                <label><input type="checkbox" class="comm-check" value="کاغذدیواری و نقاشی جدید"> کاغذدیواری/نقاشی جدید</label>
+                                <label><input type="checkbox" class="comm-check" value="تزیینات کناف سقف جدید"> کناف سقف جدید</label>
+                                <label><input type="checkbox" class="comm-check" value="نیازمند بازسازی کامل و تخریب"> ⚠️ نیاز به بازسازی اساسی</label>
+                            </div>
+                        </div>
+                        <div class="commons-box">
+                            <p>🏢 مشاعات و امتیازات ساختمانی کهنه‌ساز:</p>
+                            <div class="checkbox-grid">
+                                <label><input type="checkbox" class="comm-check" value="آسانسور نصب شده دارد"> آسانسور فعال دارد</label>
+                                <label><input type="checkbox" class="comm-check" value="پارکینگ سندی قید شده"> پارکینگ سندی قید شده</label>
+                                <label><input type="checkbox" class="comm-check" value="انباری سندی اختصاصی"> انباری سندی اختصاصی</label>
+                                <label><input type="checkbox" class="comm-check" value="قدرالسهم عالی از زمین کل"> قدرالسهم عالی از زمین</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="sec_پنت‌هوس" class="dynamic-section">
+                        <div class="commons-box" style="background:#f5eef8; border-color:#d7bde2;">
+                            <p>👑 ویژگی‌های املاک سوپرلوکس، تزیینات و پنت‌هوس:</p>
+                            <div class="checkbox-grid">
+                                <label><input type="checkbox" class="comm-check" value="تراس گاردن وسیع اختصاصی"> تراس گاردن وسیع اختصاصی</label>
+                                <label><input type="checkbox" class="comm-check" value="جکوزی لوکس داخل واحد"> جکوزی لوکس داخل واحد</label>
+                                <label><input type="checkbox" class="comm-check" value="استخر چهارفصل اختصاصی"> استخر اختصاصی پنت‌هوس</label>
+                                <label><input type="checkbox" class="comm-check" value="دید ۳۶۰ درجه پانوراما کل شهر"> دید ۳۶۰ درجه پانوراما شهری</label>
+                                <label><input type="checkbox" class="comm-check" value="آسانسور کُددار اختصاصی به واحد"> آسانسور کُددار به واحد</label>
+                                <label><input type="checkbox" class="comm-check" value="ارتفاع سقف بالای ۳.۵ متر"> ارتفاع سقف بالای ۳.۵ متر</label>
+                                <label><input type="checkbox" class="comm-check" value="سیستم فول هوشمند هتلینگ BMS"> هوشمند هتلینگ BMS</label>
+                                <label><input type="checkbox" class="comm-check" value="کلوزت روم بزرگ اتاق لباس"> کلوزت روم (اتاق لباس)</label>
+                                <label><input type="checkbox" class="comm-check" value="آشپزخانه فول فرنیش برند"> آشپزخانه فول فرنیش برند</label>
+                                <label><input type="checkbox" class="comm-check" value="سیستم صوتی توکار تمام فضا"> سیستم صوتی توکار سقف</label>
+                            </div>
+                        </div>
+                        <div class="commons-box">
+                            <p>🏛️ امکانات و مشاعات هتلینگ ابرسازه / برج:</p>
+                            <div class="checkbox-grid">
+                                <label><input type="checkbox" class="comm-check" value="لابی لوکس و مبله وسیع"> لابی لوکس و مبله وسیع</label>
+                                <label><input type="checkbox" class="comm-check" value="لابی‌من و نگهبانی ۲۴ساعته"> لابی‌من ۲۴ساعته فعال</label>
+                                <label><input type="checkbox" class="comm-check" value="سالن جیم اختصاصی Gym"> سالن بدنسازی (Gym) فعال</label>
+                                <label><input type="checkbox" class="comm-check" value="سالن اجتماعات و همایش"> سالن اجتماعات مجلل</label>
+                                <label><input type="checkbox" class="comm-check" value="روف گاردن مشاع هتلینگ"> روف گاردن مشاع هتلینگ</label>
+                                <label><input type="checkbox" class="comm-check" value="پارکینگ اختصاصی مازاد مهمان"> پارکینگ مازاد مهمان سندی</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top:10px;">
+                        <label>📝 توضیحات خاص و تکمیلی فایل (ویژه مشاور):</label>
+                        <textarea id="p_special_desc" rows="2" placeholder="مثال: مالک پول لازم شدید، تخفیف عالی پای اتاق قرارداد، قابل معاوضه با خودرو و..."></textarea>
+                    </div>
+
+                    <div class="form-group"><label>موقعیت پین‌شده جغرافیایی روی نقشه:</label><input type="text" id="p_coords" readonly placeholder="جهت ثبت فایل، ابتدا یک نقطه روی نقشه را کلیک کنید"></div>
+                    <button class="btn btn-success" onclick="savePropertyFile()">💾 ذخیره رسمی و کارشناسی فایل</button>
+                </div>
+            </div>
+
+            <!-- بخش نقشه و ابزار زون‌بندی (سمت چپ در دسکتاپ، بالا در موبایل) -->
+            <div class="map-and-zone-side">
+                
+                <div class="map-wrapper">
+                    <div id="map"></div>
+                </div>
+
+                <!-- ابزار زون‌بندی به طور کامل پایین نقشه منتقل شد -->
+                <div class="card">
+                    <h3>🛠️ ابزار مرزبندی زون‌ها (اصلی و تودرتو)</h3>
+                    <p id="draw-status" style="color:#7f8c8d; font-size:11px; margin-bottom:8px;">برای ایجاد زون جدید یا زیرزون فرعی، دکمه رسم را زده و نقاط مرزی را روی نقشه کلیک کنید.</p>
+                    <div class="flex-box">
+                        <button class="btn" style="background:#34495e;" onclick="startCustomDrawing()">⬡ رسم زون جدید</button>
+                        <button class="btn btn-danger" onclick="cancelCustomDrawing()">❌ لغو رسم</button>
+                    </div>
+                    
+                    <div id="zone-inputs" style="display:none; background:#edf2f7; padding:10px; border-radius:6px; margin-top:10px; border:1px solid #cbd5e0;">
+                        <div class="form-group"><label>نام زون اختصاصی:</label><input type="text" id="z_name" placeholder="مثلا: بزرگمهر فاز ۱"></div>
+                        
+                        <div class="flex-box">
+                            <div class="form-group" style="flex:2;"><label>تعیین زون والد (برای زون تودرتو):</label><select id="z_parent"><option value="">بدون والد (زون اصلی)</option></select></div>
+                            <div class="form-group" style="flex:1;"><label>رنگ زون:</label><input type="color" id="z_color" value="#3498db"></div>
+                        </div>
+
+                        <label>بازه قیمت عرف منطقه نوساز (میلیون تومان بر متر):</label>
+                        <div class="flex-box">
+                            <div class="form-group" style="flex:1;"><input type="number" id="z_urfi_min" placeholder="کف قیمت"></div>
+                            <div class="form-group" style="flex:1;"><input type="number" id="z_urfi_max" placeholder="سقف قیمت"></div>
+                        </div>
+                        
+                        <div class="form-group"><label>قیمت مبنای کاسبی / امضای شکار (میلیون بر متر):</label><input type="number" id="z_kasbi" placeholder="مثلا 32"></div>
+                        <div class="form-group"><label>کامنت و یادداشت تخصصی منطقه:</label><textarea id="z_comment" rows="2" placeholder="ویژگی‌ها، معایب یا مزیای خاص این زون..."></textarea></div>
+                        
+                        <button class="btn btn-success" onclick="saveCustomZone()">💾 ثبت زون روی نقشه</button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    
+    <div id="tab2" class="tab-content">
+        <div class="card">
+            <h3>👥 ثبت درخواست خریدار / متقاضی جدید</h3>
+            <div class="flex-box" style="flex-wrap: wrap; margin-top:10px; gap:10px;">
+                <input type="text" id="l_name" placeholder="نام مشتری خریدار" style="width:160px; background:white;">
+                <input type="text" id="l_phone" placeholder="تلفن تماس خریدار" style="width:150px; background:white;">
+                <select id="l_type" style="width:130px; background:white;">
+                    <option value="زمین">زمین</option><option value="کلنگی">کلنگی</option><option value="پیش‌فروش">پیش‌فروش</option>
+                    <option value="خام">خام</option><option value="فول">فول آپشن</option><option value="ویلایی">ویلایی</option>
+                    <option value="نوساز">نوساز</option><option value="کهنه‌ساز">کهنه‌ساز</option><option value="پنت‌هوس">پنت‌هوس</option>
+                </select>
+                <select id="l_zone" style="width:180px; background:white;"><option value="">انتخاب زون جغرافیایی هدف</option></select>
+                <input type="number" id="l_budget" placeholder="حداکثر بودجه (میلیارد)" style="width:160px; background:white;" step="0.1">
+                <button class="btn" onclick="addLead()" style="width:120px; background:var(--primary)">ثبت متقاضی</button>
+            </div>
+        </div>
+        <div class="card">
+            <h3>🤝 موتور تطبیق هوشمند لایو (تلاقی دقیق خریدار و فایل‌های ورودی شما)</h3>
+            <div id="matching_box" style="margin-top:10px;">هنوز اطلاعاتی برای مچینگ وارد سیستم نشده است.</div>
+        </div>
+    </div>
+
+    <div id="tab3" class="tab-content">
+        <div class="card">
+            <h3>🚀 رادار هوشمند فیلترینگ املاک زیر قیمت کارشناسی و کاسبی زاهدان</h3>
+            <p style="color:#7f8c8d; font-size:11px; margin-bottom:12px;">کدهای هوشمند سیستم موقعیت مکانی فایل را سنجیده و در صورت پایین‌تر بودن قیمت متری از خط کاسبی زون، آن را سیگنال می‌کنند.</p>
+            <div id="radar_box">در انتظار ثبت سیگنال‌های جذاب بازار...</div>
+        </div>
+    </div>
+
+    <div id="tab4" class="tab-content">
+        <div class="grid-layout" style="grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); flex-direction: column;">
+            <div class="card">
+                <h3>🏗️ دیتابیس و کارنامه سازندگان معتبر زاهدان</h3>
+                <div class="form-group" style="margin-top:8px;"><label>نام سازنده / شرکت انبوه‌سازی:</label><input type="text" id="b_name" placeholder="مهندس ..."></div>
+                <div class="form-group"><label>تلفن تماس مستقیم سازنده:</label><input type="text" id="b_phone" placeholder="0915"></div>
+                <div class="form-group"><label>رتبه تعهد و کیفیت در بازار زاهدان:</label><select id="b_rate"><option>⭐⭐⭐⭐⭐ (رتبه الف تعهد ساخت)</option><option>⭐⭐⭐⭐ (کیفیت عالی و لوکس)</option><option>⭐⭐⭐ (متوسط بازار)</option></select></div>
+                <div class="form-group"><label>زون اصلی فعالیت و متریال ساخت:</label><input type="text" id="b_desc" placeholder="مثلا تمرکز در زون دانشگاه - سازه بتنی برند"></div>
+                <button class="btn" onclick="addBuilder()">ذخیره در بانک اطلاعات سازندگان</button>
+                <div style="overflow-x: auto;">
+                    <table id="builders_table" style="margin-top:15px; min-width: 400px;"><thead><tr><th>نام سازنده</th><th>تلفن تماس</th><th>رتبه تعهد</th><th>محدوده تمرکز فعالیت</th></tr></thead><tbody></tbody></table>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>🔄 ماتریس هوشمند تهاتر ملک و خودرو</h3>
+                <div class="form-group" style="margin-top:8px;"><label>ملک یا خودروی موجود متقاضی جهت معاوضه:</label><input type="text" id="t_from" placeholder="مثلا: لندکروز ۲۰۱۴ یا کلنگی ۱۸۰ متری زیباشهر"></div>
+                <div class="form-group"><label>ارزش تقریبی کارشناسی (میلیارد تومان):</label><input type="number" id="t_val" step="0.1"></div>
+                <div class="form-group"><label>تلفن تماس متقاضی تهاتر:</label><input type="text" id="t_phone" placeholder="0915"></div>
+                <div class="form-group"><label>ملک مورد نیاز و شرایط خواسته شده جهت تهاتر:</label><input type="text" id="t_to" placeholder="مثلا: آپارتمان نوساز کلید تحویل زون دانشگاه"></div>
+                <button class="btn btn-success" onclick="addBarter()">ورود به ماتریس معاوضه بازار</button>
+                <div style="overflow-x: auto;">
+                    <table id="barter_table" style="margin-top:15px; min-width: 400px;"><thead><tr><th>اموال موجود متقاضی</th><th>ارزش برآورد</th><th>تلفن تماس</th><th>ملک درخواستی تهاتر</th></tr></thead><tbody></tbody></table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab5" class="tab-content">
+        <div class="card" style="max-width:680px; margin: 0 auto;">
+            <h3>🧮 ماشین‌حساب تخصصی تحلیل کسر ضرایب ملکی آپارتمانی زاهدان</h3>
+            <p style="color:#7f8c8d; margin-bottom:15px;">قیمت پایه عرف منطقه را وارد کنید تا سیستم تاثیر کسر یا اضافه بودن امکانات حیاتی (پارکینگ، آسانسور، نصبیات) را روی قیمت نهایی کارشناسی کند.</p>
+            
+            <div class="form-group"><label>قیمت مبنای عرف نوساز زون مورد نظر (میلیون تومان بر هر متر):</label><input type="number" id="c_base" value="42"></div>
+            
+            <div class="commons-box" style="background:white; border:1px solid #cbd5e0;">
+                <p>⚙️ آپشن‌های موجود واحد مورد نظر را تیک بزنید:</p>
+                <div class="checkbox-grid">
+                    <label><input type="checkbox" id="c_parking" checked> پارکینگ اختصاصی سندی</label>
+                    <label><input type="checkbox" id="c_elevator" checked> آسانسور فعال برند</label>
+                    <label><input type="checkbox" id="c_storage" checked> انباری سندی مجزا</label>
+                    <label><input type="checkbox" id="c_terrace" checked> تراس/بالکن کاربردی</label>
+                </div>
+            </div>
+            
+            <div class="flex-box" style="margin-top:10px;">
+                <div class="form-group" style="flex:1;"><label>هزینه کسر یا ارزش کابینت/کمد (میلیون متر):</label><input type="number" id="c_cab" value="2.0"></div>
+                <div class="form-group" style="flex:1;"><label>هزینه کسر سیستم‌های سرمایش/گرمایش:</label><input type="number" id="c_hvac" value="1.8"></div>
+            </div>
+            
+            <button class="btn btn-success" style="margin-top:10px; padding:12px;" onclick="runAdvancedCalculator()">⚙️ محاسبه کارشناسی ارزش دقیق قیمت واقعی هر متر ملک</button>
+            <div id="calc_output" style="margin-top:20px; font-weight:bold; font-size:14px; color:var(--success); text-align:center; background:#f0fff4; padding:12px; border-radius:6px; border:1px solid #c6f6d5; display:none;"></div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    let map, clickMarker = null;
+    let selectedLat = null, selectedLon = null;
+    
+    // دیتابیس‌های موقت درون برنامه‌ای سیستم
+    let USER_ZONES = {};
+    let properties = [];
+    let leads = [];
+    
+    // متغیرهای وضعیت سیستم رسم بومی
+    let isDrawingZone = false;
+    let drawPoints = [];
+    let tempPolyline = null;
+    let tempMarkers = [];
+
+    // بارگذاری نقشه پس از لود کامل DOM برای جلوگیری از باگ در موبایل
+    document.addEventListener("DOMContentLoaded", function() {
+        // تاخیر کوچک برای اطمینان از لود شدن اسکریپت Leaflet
+        setTimeout(() => {
+            if (typeof L !== 'undefined') {
+                initMap();
+            } else {
+                // اگر defer باعث تاخیر شد، با یک listener منتظر می‌مانیم
+                window.onload = initMap;
+            }
+        }, 100);
+    });
+
+    function initMap() {
+        // لود نقشه متمرکز بر زاهدان با tap=false برای جلوگیری از گیر کردن اسکرول گوشی
+        map = L.map('map', {zoomControl: true, tap: false}).setView([29.4963, 60.8629], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+        // واکشی کلیک‌ها روی سطح لایه‌ها و نقشه
+        map.on('click', function(e) { handleMapClick(e.latlng.lat, e.latlng.lng); });
+    }
+
+    // مدیریت واحد کلیک جهت رفع باگ تداخل ثبت لوکیشن و زون
+    function handleMapClick(lat, lon) {
+        if (isDrawingZone) {
+            drawPoints.push([lat, lon]);
+            let m = L.circleMarker([lat, lon], {radius: 6, color: '#e74c3c', fillColor: '#fff', fillOpacity:1, weight:3}).addTo(map);
+            tempMarkers.push(m);
+            
+            if (tempPolyline) map.removeLayer(tempPolyline);
+            tempPolyline = L.polyline(drawPoints, {color: '#e74c3c', weight: 3, dashArray: '5, 5'}).addTo(map);
+            
+            if (drawPoints.length >= 3) {
+                document.getElementById('draw-status').innerHTML = `🟢 نقاط مرزی زون (${drawPoints.length} رأس). اکنون می‌توانید مشخصات زون را در فرم زیر وارد و ثبت کنید.`;
+                document.getElementById('zone-inputs').style.display = 'block';
+                // اسکرول نرم به فرم زون در موبایل
+                document.getElementById('zone-inputs').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        } else {
+            // ثبت لوکیشن پین ملک مورد نظر
+            selectedLat = lat; selectedLon = lon;
+            document.getElementById('p_coords').value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+            if (clickMarker) map.removeLayer(clickMarker);
+            clickMarker = L.marker([lat, lon]).addTo(map);
+        }
+    }
+
+    function startCustomDrawing() {
+        isDrawingZone = true; drawPoints = [];
+        if (tempPolyline) map.removeLayer(tempPolyline);
+        tempMarkers.forEach(m => map.removeLayer(m)); tempMarkers = [];
+        document.getElementById('zone-inputs').style.display = 'none';
+        document.getElementById('draw-status').innerHTML = "🎯 حالت رسم بومی زون فعال؛ مرزهای محدوده را یکی یکی روی نقشه کلیک کنید (حداقل ۳ نقطه).";
+        // اسکرول نرم به سمت نقشه در گوشی
+        document.querySelector('.map-wrapper').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function cancelCustomDrawing() {
+        isDrawingZone = false; drawPoints = [];
+        if (tempPolyline) map.removeLayer(tempPolyline);
+        tempMarkers.forEach(m => map.removeLayer(m)); tempMarkers = [];
+        document.getElementById('zone-inputs').style.display = 'none';
+        document.getElementById('draw-status').innerHTML = "رسم لغو شد. برای رسم مجدد دکمه ایجاد زون جدید را فشار دهید.";
+    }
+
+    function toggleFormFields() {
+        let type = document.getElementById('p_type').value;
+        document.querySelectorAll('.dynamic-section').forEach(sec => sec.style.display = 'none');
+        let activeSection = document.getElementById(`sec_${type}`);
+        if (activeSection) activeSection.style.display = 'block';
+    }
+
+    // ذخیره کامل زون و ایجاد رویداد کلیک مستقل بدون ایجاد تداخل روی نقشه
+    function saveCustomZone() {
+        let name = document.getElementById('z_name').value.trim();
+        let parent = document.getElementById('z_parent').value;
+        let color = document.getElementById('z_color').value;
+        let u_min = parseFloat(document.getElementById('z_urfi_min').value);
+        let u_max = parseFloat(document.getElementById('z_urfi_max').value);
+        let kasbi = parseFloat(document.getElementById('z_kasbi').value);
+        let comment = document.getElementById('z_comment').value.trim();
+
+        if(!name || drawPoints.length < 3 || isNaN(u_min) || isNaN(u_max) || isNaN(kasbi)) { alert("نام زون، بازه قیمت عرف، قیمت کاسبی و رسم حداقل ۳ نقطه الزامی است."); return; }
+
+        let displayName = parent ? `${parent} ➔ ${name}` : name;
+
+        // استقرار لایه چندضلعی با رنگ دلخواه انتخاب شده توسط مشاور
+        let poly = L.polygon(drawPoints, {color: color, fillColor: color, fillOpacity: 0.2, weight: 2}).addTo(map);
+        
+        // هندل کلیک لایه چندضلعی به صورت ایزوله
+        poly.on('click', function(e) {
+            if(isDrawingZone) return; // تداخل در زمان رسم ایجاد نشود
+            
+            // ۱. کلیک را عبور داده و پین لوکیشن ملک را دقیقاً در همان مختصات ثبت می‌کند
+            handleMapClick(e.latlng.lat, e.latlng.lng);
+            
+            // ۲. باز کردن پاپ‌آپ مدیریت زون شامل دکمه حذف رسمی
+            let popupContent = `
+                <div style="text-align:right; direction:rtl; font-family:tahoma; font-size:12px; min-width:180px;">
+                    <b style="color:var(--primary);">📍 زون: ${displayName}</b><br>
+                    📉 عرف نوساز: ${u_min} تا ${u_max} میلیون<br>
+                    🔥 خط امضا کاسبی: ${kasbi} میلیون<br>
+                    <div style="background:#f1f2f6; padding:6px; margin-top:5px; border-radius:4px; font-size:11px; max-height:60px; overflow-y:auto;">📝 یادداشت: ${comment || 'بدون یادداشت'}</div>
+                    <button onclick="deleteZone('${name}')" style="background:var(--danger); color:white; border:none; padding:10px 6px; margin-top:8px; border-radius:4px; cursor:pointer; width:100%; font-weight:bold;">🗑️ حذف این زون</button>
+                </div>
+            `;
+            poly.bindPopup(popupContent).openPopup(e.latlng);
+            L.DomEvent.stopPropagation(e); // قطع انتشار کلیک به لایه‌های زیرین نقشه
+        });
+
+        USER_ZONES[name] = { coords: [...drawPoints], u_min, u_max, kasbi, layer: poly, parent, displayName };
+        
+        // افزودن زون به لیست والدها جهت ساخت زون‌های تودرتو فرعی بعدی
+        let parentSelect = document.getElementById('z_parent');
+        let optParent = document.createElement('option'); optParent.value = name; optParent.innerHTML = name; parentSelect.appendChild(optParent);
+
+        // افزودن زون به دراپ داون بخش خریداران در تب ۲
+        let leadSelect = document.getElementById('l_zone');
+        let optLead = document.createElement('option'); optLead.value = name; optLead.innerHTML = displayName; leadSelect.appendChild(optLead);
+
+        // ریست وضعیت فرم رسم زون
+        isDrawingZone = false;
+        tempMarkers.forEach(m => map.removeLayer(m));
+        if (tempPolyline) map.removeLayer(tempPolyline);
+        document.getElementById('zone-inputs').style.display = 'none';
+        document.getElementById('z_name').value = '';
+        document.getElementById('z_urfi_min').value = '';
+        document.getElementById('z_urfi_max').value = '';
+        document.getElementById('z_kasbi').value = '';
+        document.getElementById('z_comment').value = '';
+        document.getElementById('draw-status').innerHTML = `✅ زون "${displayName}" ثبت شد. با کلیک روی آن روی نقشه، می‌توانید آن را حذف یا لوکیشن خانه در آن پین کنید.`;
+    }
+
+    // حذف کامل زون و پاکسازی آن از تمام حافظه سیستم و نقشه
+    window.deleteZone = function(zoneName) {
+        if(confirm(`آیا از حذف کامل زون [${zoneName}] مطمئن هستید؟`)) {
+            map.removeLayer(USER_ZONES[zoneName].layer);
+            delete USER_ZONES[zoneName];
+            
+            let parentSelect = document.getElementById('z_parent');
+            for(let i = 0; i < parentSelect.options.length; i++) {
+                if(parentSelect.options[i].value === zoneName) { parentSelect.remove(i); break; }
+            }
+            let leadSelect = document.getElementById('l_zone');
+            for(let i = 0; i < leadSelect.options.length; i++) {
+                if(leadSelect.options[i].value === zoneName) { leadSelect.remove(i); break; }
+            }
+            map.closePopup();
+            document.getElementById('draw-status').innerHTML = `❌ زون مدنظر با موفقیت حذف شد.`;
+        }
+    }
+
+    // الگوریتم ری‌کستینگ برای تشخیص قرارگیری نقطه در چندضلعی زون
+    function isPointInPolygon(lat, lon, polyCoords) {
+        let inside = false;
+        for (let i = 0, j = polyCoords.length - 1; i < polyCoords.length; j = i++) {
+            let xi = polyCoords[i][0], yi = polyCoords[i][1], xj = polyCoords[j][0], yj = polyCoords[j][1];
+            let intersect = ((yi > lon) != (yj > lon)) && (lat < (xj - xi) * (lon - yi) / (yj - yi) + xi);
+            if (intersect) inside = !inside;
+        }
+        return inside;
+    }
+
+    // ذخیره کامل فایل همراه با تحلیل مکانی زون‌ها و استخراج چک‌باکس‌ها
+    function savePropertyFile() {
+        let type = document.getElementById('p_type').value;
+        let oName = document.getElementById('p_owner_name').value.trim();
+        let phone = document.getElementById('p_phone').value.trim();
+        let area = parseFloat(document.getElementById('p_area').value);
+        let price = parseFloat(document.getElementById('p_price').value);
+        let specialDesc = document.getElementById('p_special_desc').value.trim();
+
+        if (!selectedLat || isNaN(price) || !phone || isNaN(area)) { alert("تکمیل فیلدهای شماره تماس، متراژ، قیمت کل و پین کردن لوکیشن روی نقشه الزامی است."); return; }
+
+        let pricePerMeter = (price * 1000) / area; 
+
+        // تشخیص خودکار زون ملک (بررسی زون‌های فرعی/جدیدتر با اولویت بالاتر)
+        let matchedZoneKey = "خارج از زون";
+        let matchedDisplayName = "خارج از محدوده زون‌ب بندی";
+        let isDeal = false; let deviation = 0;
+
+        let zoneKeys = Object.keys(USER_ZONES).reverse();
+        for (let key of zoneKeys) {
+            if (isPointInPolygon(selectedLat, selectedLon, USER_ZONES[key].coords)) {
+                matchedZoneKey = key;
+                matchedDisplayName = USER_ZONES[key].displayName;
+                break;
+            }
+        }
+
+        // استخراج کلیه آیتم‌های تیک خورده در چک باکس‌های داینامیک آن دسته‌بندی
+        let checkedCommons = [];
+        let section = document.getElementById(`sec_${type}`);
+        if(section) {
+            section.querySelectorAll('.comm-check:checked').forEach(c => checkedCommons.push(c.value));
+        }
+
+        // سنجش سیگنال شکار و اکازیون بودن فایل
+        if (USER_ZONES[matchedZoneKey]) {
+            let zData = USER_ZONES[matchedZoneKey];
+            if (pricePerMeter <= zData.kasbi) isDeal = true;
+            deviation = ((pricePerMeter - ((zData.u_min + zData.u_max)/2)) / ((zData.u_min + zData.u_max)/2)) * 100;
+        }
+
+        let propertyItem = {
+            type, owner: oName || "ثبت نشده", phone, area, totalPrice: price, priceMeter: pricePerMeter.toFixed(1),
+            zone: matchedZoneKey, zoneDisplay: matchedDisplayName, isDeal, dev: deviation.toFixed(1), 
+            commons: checkedCommons.join(' | '), specialDesc: specialDesc || "بدون توضیحات تکمیلی"
+        };
+        
+        properties.push(propertyItem);
+        
+        // تغییر رنگ مارکر بر اساس نوع قیمت (قرمز برای شکار، آبی برای فایل عادی)
+        let iconUrl = isDeal ? 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png' : 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png';
+        L.marker([selectedLat, selectedLon], {
+            icon: L.icon({ iconUrl: iconUrl, shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41] })
+        }).addTo(map).bindPopup(`
+            <div style="text-align:right; direction:rtl; font-family:tahoma; font-size:12px; max-width:240px;">
+                <b style="color:var(--primary);">🏠 فایل ${type} [${oName || 'بدون نام'}]</b><br>
+                📍 محدوده مکانی: ${matchedDisplayName}<br>
+                💰 قیمت متری: ${pricePerMeter.toFixed(1)} میلیون<br>
+                💎 ویژگی‌ها: <span style="font-size:10px; color:var(--accent); font-weight:bold;">${checkedCommons.join(' ، ') || 'بدون ویژگی'}</span><br>
+                📝 توضیحات تکمیلی: <span style="font-size:11px; color:#555;">${specialDesc || 'ندارد'}</span>
+            </div>
+        `);
+
+        alert(`فایل "${type}" کارشناسی شد و در محدوده زون [${matchedDisplayName}] به ثبت رسید.`);
+        
+        // ریست فیلدهای فرم ورودی
+        document.getElementById('p_owner_name').value = '';
+        document.getElementById('p_phone').value = '';
+        document.getElementById('p_area').value = '';
+        document.getElementById('p_price').value = '';
+        document.getElementById('p_special_desc').value = '';
+        if(section) {
+            section.querySelectorAll('.comm-check').forEach(c => c.checked = false);
+        }
+
+        // آپدیت لایو خروجی رادار و تب تطبیق
+        updateRadar(); 
+        updateMatching();
+    }
+
+    // تب ۲: ثبت خریدار جدید متقاضی املاک
+    function addLead() {
+        let name = document.getElementById('l_name').value.trim();
+        let phone = document.getElementById('l_phone').value.trim();
+        let type = document.getElementById('l_type').value;
+        let zone = document.getElementById('l_zone').value;
+        let budget = parseFloat(document.getElementById('l_budget').value);
+
+        if(!name || !zone || isNaN(budget) || !phone) { alert("لطفاً مشخصات کامل مشتری متقاضی، زون هدف و سقف بودجه خرید را وارد کنید."); return; }
+        leads.push({ name, phone, type, zone, budget });
+        
+        alert(`متقاضی خرید "${name}" ثبت و موتور مچینگ فعال گردید.`);
+        
+        document.getElementById('l_name').value = '';
+        document.getElementById('l_phone').value = '';
+        document.getElementById('l_budget').value = '';
+        updateMatching();
+    }
+
+    // تب ۲: هسته موتور تطبیق هوشمند لایو
+    function updateMatching() {
+        let box = document.getElementById('matching_box');
+        if(leads.length === 0) { box.innerHTML = "هنوز خریدار متقاضی ثبت نشده است."; return; }
+        
+        let html = "<table><tr><th>خریدار متقاضی</th><th>تلفن تماس</th><th>نوع ملک & زون هدف</th><th>فایل‌های مکانی منطبق کشف شده</th></tr>";
+        
+        leads.forEach(l => {
+            // انطباق چندوجهی: هم زون باشد، هم سبک ملک همخوانی داشته باشد و هم قیمت کل کمتر از بودجه خریدار باشد
+            let matchedFiles = properties.filter(p => p.zone === l.zone && p.type === l.type && p.totalPrice <= l.budget);
+            let fileText = "";
+            
+            if(matchedFiles.length > 0) {
+                fileText = matchedFiles.map(f => `🏠 فایل متراژ ${f.area} متری | قیمت کل: ${f.totalPrice} میلیارد (متری ${f.priceMeter} م) <br> 👤 مالک: ${f.owner} - 📞 تماس: <b>${f.phone}</b> <br> <span style="color:var(--accent); font-size:10px;">⚙️ آپشن‌ها: [${f.commons || 'بدون آپشن مشخص'}]</span><br><span style="color:#666; font-size:11px;">📝 توضیحات: ${f.specialDesc}</span>`).join('<hr style="margin:6px 0; border:0; border-top:1px dashed #cbd5e0;">');
+            } else {
+                fileText = "<span style='color:var(--danger); font-weight:bold;'>❌ موردی مطابق با بودجه و موقعیت این خریدار یافت نشد.</span>";
+            }
+            
+            let zName = USER_ZONES[l.zone] ? USER_ZONES[l.zone].displayName : l.zone;
+            html += `<tr><td><b>${l.name}</b></td><td>${l.phone}</td><td>زون ${zName} <br> سبک: [${l.type}]</td><td>${fileText}</td></tr>`;
+        });
+        html += "</table>";
+        box.innerHTML = html;
+    }
+
+    // تب ۳: رادار خروجی لایو شکار فرصت‌های املاک زیر قیمت
+    function updateRadar() {
+        let huntFiles = properties.filter(p => p.isDeal);
+        let radarBox = document.getElementById('radar_box');
+        
+        if(huntFiles.length === 0) {
+            radarBox.innerHTML = "<div style='color:#7f8c8d; text-align:center; padding:20px;'>در حال حاضر فایلی که زیر خط امضا و کاسبی زون باشد ثبت نشده است.</div>";
+            return;
+        }
+        
+        let html = "";
+        huntFiles.forEach(h => {
+            html += `<div class='hunt-card'>
+                🔥 <b>سیگنال اکازیون شکار بازار:</b> ملک دسته‌بندی <b>[${h.type}]</b> واقع در محدوده <b>${h.zoneDisplay}</b> <br>
+                متراژ: ${h.area} متر | قیمت مالک: متری <span style='color:var(--danger); font-weight:bold;'>${h.priceMeter} میلیون</span> 
+                (${Math.abs(h.dev)}% زیر خط میانگین قیمت نوساز منطقه!) <br>
+                👤 مالک/فروشنده: ${h.owner} | 📞 تلفن هماهنگی جلسه امضا: <b style="font-size:13px; color:var(--success);">${h.phone}</b> <br>
+                💎 تیک‌های فعال فایل: <span style="color:var(--primary); font-size:11px;">[ ${h.commons || 'بدون ویژگی مشخص'} ]</span><br>
+                📝 توضیحات خاص مشاور: <span style="color:#c0392b; font-size:11px; font-weight:bold;">${h.specialDesc}</span>
+            </div>`;
+        });
+        radarBox.innerHTML = html;
+    }
+
+    // تب ۴: بانک اطلاعات سازندگان زاهدان
+    function addBuilder() {
+        let name = document.getElementById('b_name').value.trim();
+        let phone = document.getElementById('b_phone').value.trim();
+        let rate = document.getElementById('b_rate').value;
+        let desc = document.getElementById('b_desc').value.trim();
+        if(!name || !phone) { alert("وارد کردن نام و شماره تلفن مستقیم سازنده الزامی است."); return; }
+        
+        let table = document.getElementById('builders_table').getElementsByTagName('tbody')[0];
+        let row = table.insertRow(-1);
+        row.innerHTML = `<td><b>${name}</b></td><td><b>${phone}</b></td><td><span style='color:#f1c40f;'>${rate}</span></td><td>${desc || 'ثبت نشده'}</td>`;
+        
+        document.getElementById('b_name').value = '';
+        document.getElementById('b_phone').value = '';
+        document.getElementById('b_desc').value = '';
+        alert("اطلاعات سازنده با موفقیت در بانک کارنامه سازندگان ذخیره شد.");
+    }
+
+    // تب ۴: ماتریس هوشمند تهاتر ملک و خودرو
+    function addBarter() {
+        let from = document.getElementById('t_from').value.trim();
+        let val = document.getElementById('t_val').value;
+        let phone = document.getElementById('t_phone').value.trim();
+        let to = document.getElementById('t_to').value.trim();
+        if(!from || isNaN(parseFloat(val)) || !phone) { alert("اطلاعات معاوضه، ارزش برآورد و شماره تلفن متقاضی را مشخص کنید."); return; }
+        
+        let table = document.getElementById('barter_table').getElementsByTagName('tbody')[0];
+        let row = table.insertRow(-1);
+        row.innerHTML = `<td>${from}</td><td><span style='color:var(--success); font-weight:bold;'>${val} میلیارد</span></td><td><b>${phone}</b></td><td>${to || 'هر نوع ملک هم ارزش'}</td>`;
+        
+        document.getElementById('t_from').value = '';
+        document.getElementById('t_val').value = '';
+        document.getElementById('t_phone').value = '';
+        document.getElementById('t_to').value = '';
+        alert("مورد معاوضه‌ای جدید با موفقیت به ماتریس تهاتر بازار افزوده شد.");
+    }
+
+    // تب ۵: هوش الگوریتم محاسباتی کسر ضرایب و آپشن‌های ساختمان
+    function runAdvancedCalculator() {
+        let base = parseFloat(document.getElementById('c_base').value);
+        let cab = parseFloat(document.getElementById('c_cab').value);
+        let hvac = parseFloat(document.getElementById('c_hvac').value);
+        
+        if (isNaN(base)) { alert("قیمت مبنای عرف نوساز منطقه را به میلیون وارد کنید."); return; }
+
+        let hasParking = document.getElementById('c_parking').checked;
+        let hasElevator = document.getElementById('c_elevator').checked;
+        let hasStorage = document.getElementById('c_storage').checked;
+        let hasTerrace = document.getElementById('c_terrace').checked;
+
+        // کسر ضرایب تجربی بازار زاهدان به ازای نبود امکانات کلیدی سندی
+        if (!hasParking) base = base * 0.90;  // ۱۰٪ کسر ارزش به علت نبود پارکینگ اختصاصی باکس
+        if (!hasElevator) base = base * 0.92; // ۸٪ کسر قیمت برای طبقات بالا بدون آسانسور
+        if (!hasStorage) base = base * 0.97;  // ۳٪ کسر قیمت نبود انباری سندی مستقل
+        if (!hasTerrace) base = base * 0.96;  // ۴٪ کسر قیمت به علت نبود تراس کاربردی
+
+        // کسر مخارج تکمیلی و نصبیات واحدهای خام تحویلی
+        let finalPrice = base - (cab + hvac);
+
+        let outBox = document.getElementById('calc_output');
+        outBox.style.display = "block";
+        outBox.innerHTML = `📐 ارزش واقعی، کارشناسی و مهندسی کارکرد هر متر این ملک در بازار فعلی:<br>
+        <span style="font-size:18px; color:var(--success); font-weight:bold;">متری ${finalPrice.toFixed(2)} میلیون تومان</span>`;
+    }
+
+    function openTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+        
+        // رندر و ری‌لود نقشه لیروفیت در زمان جابجایی تب جهت برطرف کردن کامل باگ خاکستری شدن نقشه
+        if(tabId === 'tab1' && typeof map !== 'undefined') {
+            setTimeout(() => map.invalidateSize(), 250);
+        }
+    }
+</script>
+<script>
+function previewImages() {
+    const preview = document.getElementById('image-preview');
+    const files = document.getElementById('p_images').files;
+    preview.innerHTML = ''; // پاک کردن پیش‌نمایش قبلی
+
+    for (let i = 0; i < files.length; i++) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.style.width = '80px';
+            img.style.height = '80px';
+            img.style.objectFit = 'cover';
+            img.style.borderRadius = '5px';
+            preview.appendChild(img);
+        }
+        reader.readAsDataURL(files[i]);
+    }
+}
+</script>
+</body>
+</html>
