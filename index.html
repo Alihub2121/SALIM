@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>سامانه پیشرفته و جامع ژئومارکتینگ املاک زاهدان | VisionPro</title>
     
-    <!-- بهینه‌سازی لود فایل‌های خارجی برای گوشی -->
     <link rel="preconnect" href="https://unpkg.com">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
@@ -27,7 +26,6 @@
         body { background-color: #f1f2f6; color: var(--dark); font-size: 13px; }
         header { background: var(--primary); color: white; padding: 14px; text-align: center; font-weight: bold; font-size: 16px; box-shadow: var(--shadow); }
 
-        /* بهینه‌سازی نوار تب‌ها برای تاچ گوشی */
         .tabs-nav { display: flex; overflow-x: auto; background: white; box-shadow: var(--shadow); padding: 6px; gap: 6px; position: sticky; top: 0; z-index: 1000; -webkit-overflow-scrolling: touch; }
         .tab-btn { background: none; color: #7f8c8d; border: none; padding: 12px 18px; cursor: pointer; border-radius: var(--radius); font-weight: bold; white-space: nowrap; font-size: 12px; transition: all 0.2s; min-height: 44px; touch-action: manipulation; }
         .tab-btn.active { background: var(--accent); color: white; }
@@ -37,9 +35,8 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* اصلاح ساختار گرید برای گوشی و دسکتاپ */
         .grid-layout { display: flex; flex-direction: column; gap: 15px; }
-        .map-and-zone-side { order: -1; } /* در گوشی نقشه و زون اول نمایش داده می‌شود */
+        .map-and-zone-side { order: -1; }
         
         @media(min-width: 992px) { 
             .grid-layout { display: grid; grid-template-columns: 480px 1fr; } 
@@ -52,7 +49,6 @@
         .form-group { margin-bottom: 10px; }
         label { display: block; margin-bottom: 4px; font-weight: bold; font-size: 11px; color: #4a5568; }
         
-        /* بهینه‌سازی فیلدها برای تایپ راحت در موبایل */
         input, select, textarea { width: 100%; padding: 8px 10px; border: 1.5px solid #dcdde1; border-radius: 6px; background: var(--light); font-size: 12px; color: var(--dark); min-height: 40px; }
         input[type="color"] { padding: 2px 5px; height: 40px; cursor: pointer; }
         input:focus, select:focus, textarea:focus { border-color: var(--accent); outline: none; background: white; box-shadow: 0 0 0 3px rgba(26,188,156,0.1); }
@@ -60,26 +56,23 @@
         .flex-box { display: flex; gap: 8px; margin-bottom: 5px; flex-wrap: wrap; }
         @media(min-width: 400px) { .flex-box { flex-wrap: nowrap; } }
 
-        /* بهینه‌سازی دکمه‌ها برای تاچ */
         .btn { background: var(--accent); color: white; border: none; padding: 10px; width: 100%; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; text-align: center; transition: background 0.2s; min-height: 44px; touch-action: manipulation; display: flex; align-items: center; justify-content: center; }
         .btn:hover { opacity: 0.9; }
         .btn-success { background: var(--success); }
         .btn-danger { background: var(--danger); }
 
-        /* ارتفاع داینامیک نقشه برای گوشی */
         .map-wrapper { height: 50vh; min-height: 350px; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); position: relative; border: 2px solid var(--primary); margin-bottom: 15px; }
         @media(min-width: 992px) { .map-wrapper { height: 60vh; position: sticky; top: 15px; } }
         #map { width: 100%; height: 100%; z-index: 1; }
 
         .dynamic-section { display: none; background: #fafbfc; border: 1px dashed var(--accent); padding: 12px; border-radius: 6px; margin-top: 10px; }
-        
         .commons-box { background: #ebf5fb; padding: 10px; border-radius: 6px; margin-top: 8px; border: 1px solid #aed6f1; }
         .commons-box p { font-weight: bold; margin-bottom: 6px; color: #2e4053; font-size: 11px; }
 
         .checkbox-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
         @media(min-width: 400px) { .checkbox-grid { grid-template-columns: repeat(3, 1fr); } }
         .checkbox-grid label { display: flex; align-items: center; gap: 4px; font-weight: normal; cursor: pointer; font-size: 11px; background: white; padding: 8px 4px; border-radius: 4px; border: 1px solid #edf2f7; min-height: 35px;}
-        .checkbox-grid input { width: auto; cursor: pointer; min-height: unset; margin:0;}
+        .checkbox-grid input { width: auto; cursor: pointer; min-height: unset; margin: 0;}
 
         table { width: 100%; border-collapse: collapse; margin-top: 8px; background: white; box-shadow: var(--shadow); border-radius: var(--radius); overflow: hidden; }
         th, td { padding: 10px; text-align: right; border-bottom: 1px solid #edf2f7; font-size: 12px; }
@@ -87,6 +80,7 @@
         tr:hover { background-color: #f8f9fa; }
         
         .hunt-card { border-right: 5px solid var(--danger); background: #fff5f5; padding: 12px; border-radius: 6px; margin-bottom: 10px; box-shadow: var(--shadow); }
+        .img-preview-container img { width: 65px; height: 65px; object-fit: cover; border-radius: 6px; border: 1px solid #ddd; }
     </style>
 </head>
 <body>
@@ -97,7 +91,7 @@
     <button class="tab-btn active" onclick="openTab('tab1')">🗺️ نقشه و ثبت فایل</button>
     <button class="tab-btn" onclick="openTab('tab2')">👥 متقاضیان & تطبیق</button>
     <button class="tab-btn" onclick="openTab('tab3')">🚀 رادار شکار فرصت‌ها</button>
-    <button class="tab-btn" onclick="openTab('tab4')">🏢 کارنامه سازندگان & تهاتر</button>
+    <button class="tab-btn" onclick="openTab('tab4')">🏢 بانک اطلاعاتی جامع & تهاتر</button>
     <button class="tab-btn" onclick="openTab('tab5')">🧮 ماشین‌حساب تخصصی بازار</button>
 </div>
 
@@ -106,7 +100,6 @@
     <div id="tab1" class="tab-content active">
         <div class="grid-layout">
             
-            <!-- بخش فرم مشخصات ملک (سمت راست در دسکتاپ، پایین در موبایل) -->
             <div class="property-form-side">
                 <div class="card">
                     <h3>📋 فرم هوشمند کارشناسی و ثبت فایل</h3>
@@ -140,11 +133,13 @@
                         <label>جهت ملک / موقعیت بنا:</label>
                         <select id="p_dir"><option>شمالی</option><option>جنوبی</option><option>دو کله</option><option>بر اصلی خیابان/کوچه</option></select>
                     </div>
-<div class="card">
-    <h3>📸 تصاویر ملک</h3>
-    <input type="file" id="p_images" accept="image/*" multiple onchange="previewImages()">
-    <div id="image-preview" style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;"></div>
-</div>
+
+                    <div class="form-group" style="margin-top:12px; margin-bottom:15px;">
+                        <label style="color:var(--primary); font-weight:bold;">📸 آپلود تصاویر ملک از حافظه گوشی (لوکال):</label>
+                        <input type="file" id="p_images" accept="image/*" multiple onchange="previewImages()" style="padding-top:10px;">
+                        <div id="image-preview" class="img-preview-container" style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;"></div>
+                    </div>
+
                     <div id="sec_زمین" class="dynamic-section" style="display:block;">
                         <div class="commons-box">
                             <p>📐 مشخصات و نوع سند زمین:</p>
@@ -361,14 +356,12 @@
                 </div>
             </div>
 
-            <!-- بخش نقشه و ابزار زون‌بندی (سمت چپ در دسکتاپ، بالا در موبایل) -->
             <div class="map-and-zone-side">
                 
                 <div class="map-wrapper">
                     <div id="map"></div>
                 </div>
 
-                <!-- ابزار زون‌بندی به طور کامل پایین نقشه منتقل شد -->
                 <div class="card">
                     <h3>🛠️ ابزار مرزبندی زون‌ها (اصلی و تودرتو)</h3>
                     <p id="draw-status" style="color:#7f8c8d; font-size:11px; margin-bottom:8px;">برای ایجاد زون جدید یا زیرزون فرعی، دکمه رسم را زده و نقاط مرزی را روی نقشه کلیک کنید.</p>
@@ -394,7 +387,25 @@
                         <div class="form-group"><label>قیمت مبنای کاسبی / امضای شکار (میلیون بر متر):</label><input type="number" id="z_kasbi" placeholder="مثلا 32"></div>
                         <div class="form-group"><label>کامنت و یادداشت تخصصی منطقه:</label><textarea id="z_comment" rows="2" placeholder="ویژگی‌ها، معایب یا مزیای خاص این زون..."></textarea></div>
                         
-                        <button class="btn btn-success" onclick="saveCustomZone()">💾 ثبت زون روی نقشه</button>
+                        <button id="save-zone-btn" class="btn btn-success" onclick="saveCustomZone()">💾 ثبت زون روی نقشه</button>
+                    </div>
+                </div>
+
+                <div id="zones-list-card" class="card" style="margin-top: 10px; display: none;">
+                    <h3>📋 لیست و مدیریت زون‌های ثبت‌شده (قابل ویرایش)</h3>
+                    <div style="overflow-x: auto;">
+                        <table id="zones_table">
+                            <thead>
+                                <tr>
+                                    <th>نام زون</th>
+                                    <th>زون والد</th>
+                                    <th>عرف (میلیون)</th>
+                                    <th>کاسبی (میلیون)</th>
+                                    <th>عملیات</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
                     </div>
                 </div>
 
@@ -434,7 +445,8 @@
     </div>
 
     <div id="tab4" class="tab-content">
-        <div class="grid-layout" style="grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); flex-direction: column;">
+        <div class="grid-layout" style="grid-template-columns: repeat(auto-fit, minmax(45%, 1fr)); flex-direction: column;">
+            
             <div class="card">
                 <h3>🏗️ دیتابیس و کارنامه سازندگان معتبر زاهدان</h3>
                 <div class="form-group" style="margin-top:8px;"><label>نام سازنده / شرکت انبوه‌سازی:</label><input type="text" id="b_name" placeholder="مهندس ..."></div>
@@ -458,6 +470,38 @@
                     <table id="barter_table" style="margin-top:15px; min-width: 400px;"><thead><tr><th>اموال موجود متقاضی</th><th>ارزش برآورد</th><th>تلفن تماس</th><th>ملک درخواستی تهاتر</th></tr></thead><tbody></tbody></table>
                 </div>
             </div>
+
+            <div class="card">
+                <h3>👥 بانک اطلاعات مدیران ساختمان‌های زاهدان</h3>
+                <div class="form-group" style="margin-top:8px;"><label>نام مدیر ساختمان / مجتمع:</label><input type="text" id="m_name" placeholder="آقای/خانم ..."></div>
+                <div class="form-group"><label>تلفن تماس مستقیم:</label><input type="text" id="m_phone" placeholder="0915"></div>
+                <div class="form-group"><label>مجتمع‌ها / ساختمان‌های تحت مدیریت:</label><input type="text" id="m_buildings" placeholder="مثلا: مجتمع پردیس بلوار دانشگاه، آپارتمانهای زیباشهر"></div>
+                <div class="form-group"><label>یادداشت، قوانین خاص یا وضعیت شارژ:</label><input type="text" id="m_notes" placeholder="مثلا: مدیریت سخت‌گیر، وضعیت نظافت عالی"></div>
+                <button class="btn" style="background:#8e44ad;" onclick="addBuildingManager()">ذخیره در بانک مدیران</button>
+                <div style="overflow-x: auto;">
+                    <table id="managers_table" style="margin-top:15px; min-width: 400px;"><thead><tr><th>نام مدیر</th><th>تلفن تماس</th><th>ساختمان‌های تحت مدیریت</th><th>یادداشت تخصصی</th></tr></thead><tbody></tbody></table>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>🛡️ شبکه نگهبانان و تیم‌های حفاظتی مجتمع‌ها</h3>
+                <div class="form-group" style="margin-top:8px;"><label>نام نگهبان / مأمور حفاظتی:</label><input type="text" id="g_name" placeholder="نام فرد..."></div>
+                <div class="form-group"><label>تلفن تماس مستقیم:</label><input type="text" id="g_phone" placeholder="0915"></div>
+                <div class="form-group">
+                    <label>شیفت کاری فعال:</label>
+                    <select id="g_shift">
+                        <option>☀️ شیفت روز (صبح تا عصر)</option>
+                        <option>🌙 شیفت شب (عصر تا صبح)</option>
+                        <option>🔄 ۲۴ ساعته / چرخشی</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>زون یا مجتمع محل استقرار:</label><input type="text" id="g_zone" placeholder="مثلا: زون بزرگمهر - مجتمع اسکان"></div>
+                <button class="btn" style="background:#d35400;" onclick="addGuard()">ذخیره در شبکه نگهبانان</button>
+                <div style="overflow-x: auto;">
+                    <table id="guards_table" style="margin-top:15px; min-width: 400px;"><thead><tr><th>نام نگهبان</th><th>تلفن تماس</th><th>شیفت کاری</th><th>محل استقرار</th></tr></thead><tbody></tbody></table>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -494,40 +538,47 @@
     let map, clickMarker = null;
     let selectedLat = null, selectedLon = null;
     
-    // دیتابیس‌های موقت درون برنامه‌ای سیستم
     let USER_ZONES = {};
     let properties = [];
     let leads = [];
     
-    // متغیرهای وضعیت سیستم رسم بومی
     let isDrawingZone = false;
     let drawPoints = [];
     let tempPolyline = null;
     let tempMarkers = [];
 
-    // بارگذاری نقشه پس از لود کامل DOM برای جلوگیری از باگ در موبایل
     document.addEventListener("DOMContentLoaded", function() {
-        // تاخیر کوچک برای اطمینان از لود شدن اسکریپت Leaflet
         setTimeout(() => {
             if (typeof L !== 'undefined') {
                 initMap();
             } else {
-                // اگر defer باعث تاخیر شد، با یک listener منتظر می‌مانیم
                 window.onload = initMap;
             }
         }, 100);
     });
 
     function initMap() {
-        // لود نقشه متمرکز بر زاهدان با tap=false برای جلوگیری از گیر کردن اسکرول گوشی
         map = L.map('map', {zoomControl: true, tap: false}).setView([29.4963, 60.8629], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-
-        // واکشی کلیک‌ها روی سطح لایه‌ها و نقشه
         map.on('click', function(e) { handleMapClick(e.latlng.lat, e.latlng.lng); });
     }
 
-    // مدیریت واحد کلیک جهت رفع باگ تداخل ثبت لوکیشن و زون
+    // پیش‌نمایش لوکال تصاویر
+    function previewImages() {
+        const preview = document.getElementById('image-preview');
+        const files = document.getElementById('p_images').files;
+        preview.innerHTML = '';
+        for (let file of files) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                preview.appendChild(img);
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
     function handleMapClick(lat, lon) {
         if (isDrawingZone) {
             drawPoints.push([lat, lon]);
@@ -536,16 +587,14 @@
             
             if (tempPolyline) map.removeLayer(tempPolyline);
             tempPolyline = L.polyline(drawPoints, {color: '#e74c3c', weight: 3, dashArray: '5, 5'}).addTo(map);
-            
             if (drawPoints.length >= 3) {
-                document.getElementById('draw-status').innerHTML = `🟢 نقاط مرزی زون (${drawPoints.length} رأس). اکنون می‌توانید مشخصات زون را در فرم زیر وارد و ثبت کنید.`;
+                document.getElementById('draw-status').innerHTML = `🟢 نقاط مرزی زون (${drawPoints.length} رأس). اکنون می‌توانید مشخصات زون را وارد و ثبت کنید.`;
                 document.getElementById('zone-inputs').style.display = 'block';
-                // اسکرول نرم به فرم زون در موبایل
                 document.getElementById('zone-inputs').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
         } else {
-            // ثبت لوکیشن پین ملک مورد نظر
-            selectedLat = lat; selectedLon = lon;
+            selectedLat = lat;
+            selectedLon = lon;
             document.getElementById('p_coords').value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
             if (clickMarker) map.removeLayer(clickMarker);
             clickMarker = L.marker([lat, lon]).addTo(map);
@@ -553,21 +602,41 @@
     }
 
     function startCustomDrawing() {
-        isDrawingZone = true; drawPoints = [];
+        isDrawingZone = true;
+        drawPoints = [];
         if (tempPolyline) map.removeLayer(tempPolyline);
         tempMarkers.forEach(m => map.removeLayer(m)); tempMarkers = [];
         document.getElementById('zone-inputs').style.display = 'none';
-        document.getElementById('draw-status').innerHTML = "🎯 حالت رسم بومی زون فعال؛ مرزهای محدوده را یکی یکی روی نقشه کلیک کنید (حداقل ۳ نقطه).";
-        // اسکرول نرم به سمت نقشه در گوشی
+        document.getElementById('z_name').disabled = false;
+        document.getElementById('save-zone-btn').innerHTML = "💾 ثبت زون روی نقشه";
+        document.getElementById('draw-status').innerHTML = "🎯 حالت رسم بومی فعال؛ مرزها را کلیک کنید. (زون‌های قبلی موقتاً غیرفعال شدند تا رسم تودرتو بدون خطا انجام شود).";
+        
+        // غیرفعال کردن موقت لایه‌های قبلی جهت جلوگیری از تداخل کلیک در رسم زون‌های تودرتو
+        for (let key in USER_ZONES) {
+            if (USER_ZONES[key].layer) {
+                USER_ZONES[key].layer.setStyle({ interactive: false });
+            }
+        }
         document.querySelector('.map-wrapper').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
+    function endCustomDrawing() {
+        isDrawingZone = false;
+        // فعال‌سازی مجدد لایه‌ها بعد از اتمام رسم
+        for (let key in USER_ZONES) {
+            if (USER_ZONES[key].layer) {
+                USER_ZONES[key].layer.setStyle({ interactive: true });
+            }
+        }
+    }
+
     function cancelCustomDrawing() {
-        isDrawingZone = false; drawPoints = [];
+        endCustomDrawing();
+        drawPoints = [];
         if (tempPolyline) map.removeLayer(tempPolyline);
         tempMarkers.forEach(m => map.removeLayer(m)); tempMarkers = [];
         document.getElementById('zone-inputs').style.display = 'none';
-        document.getElementById('draw-status').innerHTML = "رسم لغو شد. برای رسم مجدد دکمه ایجاد زون جدید را فشار دهید.";
+        document.getElementById('draw-status').innerHTML = "رسم لغو شد.";
     }
 
     function toggleFormFields() {
@@ -577,7 +646,6 @@
         if (activeSection) activeSection.style.display = 'block';
     }
 
-    // ذخیره کامل زون و ایجاد رویداد کلیک مستقل بدون ایجاد تداخل روی نقشه
     function saveCustomZone() {
         let name = document.getElementById('z_name').value.trim();
         let parent = document.getElementById('z_parent').value;
@@ -587,46 +655,68 @@
         let kasbi = parseFloat(document.getElementById('z_kasbi').value);
         let comment = document.getElementById('z_comment').value.trim();
 
-        if(!name || drawPoints.length < 3 || isNaN(u_min) || isNaN(u_max) || isNaN(kasbi)) { alert("نام زون، بازه قیمت عرف، قیمت کاسبی و رسم حداقل ۳ نقطه الزامی است."); return; }
+        if(!name || isNaN(u_min) || isNaN(u_max) || isNaN(kasbi)) { 
+            alert("پر کردن فیلدهای اصلی زون الزامی است."); 
+            return; 
+        }
+
+        // بررسی حالت ویرایش مشخصات متنی زون
+        if (document.getElementById('z_name').disabled) {
+            USER_ZONES[name].u_min = u_min;
+            USER_ZONES[name].u_max = u_max;
+            USER_ZONES[name].kasbi = kasbi;
+            USER_ZONES[name].comment = comment;
+            USER_ZONES[name].parent = parent;
+            USER_ZONES[name].displayName = parent ? `${parent} ➔ ${name}` : name;
+            USER_ZONES[name].layer.setStyle({color: color, fillColor: color});
+            
+            document.getElementById('z_name').disabled = false;
+            document.getElementById('save-zone-btn').innerHTML = "💾 ثبت زون روی نقشه";
+            document.getElementById('zone-inputs').style.display = 'none';
+            document.getElementById('z_name').value = '';
+            document.getElementById('z_urfi_min').value = '';
+            document.getElementById('z_urfi_max').value = '';
+            document.getElementById('z_kasbi').value = '';
+            document.getElementById('z_comment').value = '';
+            
+            endCustomDrawing();
+            updateZonesList();
+            alert("مشخصات زون با موفقیت به‌روزرسانی شد.");
+            return;
+        }
+
+        if (drawPoints.length < 3) { alert("رسم حداقل ۳ نقطه روی نقشه الزامی است."); return; }
 
         let displayName = parent ? `${parent} ➔ ${name}` : name;
-
-        // استقرار لایه چندضلعی با رنگ دلخواه انتخاب شده توسط مشاور
         let poly = L.polygon(drawPoints, {color: color, fillColor: color, fillOpacity: 0.2, weight: 2}).addTo(map);
         
-        // هندل کلیک لایه چندضلعی به صورت ایزوله
         poly.on('click', function(e) {
-            if(isDrawingZone) return; // تداخل در زمان رسم ایجاد نشود
-            
-            // ۱. کلیک را عبور داده و پین لوکیشن ملک را دقیقاً در همان مختصات ثبت می‌کند
+            if(isDrawingZone) return; 
             handleMapClick(e.latlng.lat, e.latlng.lng);
             
-            // ۲. باز کردن پاپ‌آپ مدیریت زون شامل دکمه حذف رسمی
             let popupContent = `
                 <div style="text-align:right; direction:rtl; font-family:tahoma; font-size:12px; min-width:180px;">
                     <b style="color:var(--primary);">📍 زون: ${displayName}</b><br>
                     📉 عرف نوساز: ${u_min} تا ${u_max} میلیون<br>
                     🔥 خط امضا کاسبی: ${kasbi} میلیون<br>
                     <div style="background:#f1f2f6; padding:6px; margin-top:5px; border-radius:4px; font-size:11px; max-height:60px; overflow-y:auto;">📝 یادداشت: ${comment || 'بدون یادداشت'}</div>
-                    <button onclick="deleteZone('${name}')" style="background:var(--danger); color:white; border:none; padding:10px 6px; margin-top:8px; border-radius:4px; cursor:pointer; width:100%; font-weight:bold;">🗑️ حذف این زون</button>
+                    <button onclick="deleteZone('${name}')" style="background:var(--danger); color:white; border:none; padding:6px; margin-top:8px; border-radius:4px; cursor:pointer; width:100%; font-weight:bold;">🗑️ حذف زون</button>
                 </div>
             `;
             poly.bindPopup(popupContent).openPopup(e.latlng);
-            L.DomEvent.stopPropagation(e); // قطع انتشار کلیک به لایه‌های زیرین نقشه
+            L.DomEvent.stopPropagation(e);
         });
 
-        USER_ZONES[name] = { coords: [...drawPoints], u_min, u_max, kasbi, layer: poly, parent, displayName };
+        USER_ZONES[name] = { coords: [...drawPoints], u_min, u_max, kasbi, layer: poly, parent, displayName, comment };
         
-        // افزودن زون به لیست والدها جهت ساخت زون‌های تودرتو فرعی بعدی
+        // بروزرسانی دراپ‌داون‌ها
         let parentSelect = document.getElementById('z_parent');
         let optParent = document.createElement('option'); optParent.value = name; optParent.innerHTML = name; parentSelect.appendChild(optParent);
 
-        // افزودن زون به دراپ داون بخش خریداران در تب ۲
         let leadSelect = document.getElementById('l_zone');
         let optLead = document.createElement('option'); optLead.value = name; optLead.innerHTML = displayName; leadSelect.appendChild(optLead);
 
-        // ریست وضعیت فرم رسم زون
-        isDrawingZone = false;
+        // ریست فرم
         tempMarkers.forEach(m => map.removeLayer(m));
         if (tempPolyline) map.removeLayer(tempPolyline);
         document.getElementById('zone-inputs').style.display = 'none';
@@ -635,10 +725,57 @@
         document.getElementById('z_urfi_max').value = '';
         document.getElementById('z_kasbi').value = '';
         document.getElementById('z_comment').value = '';
-        document.getElementById('draw-status').innerHTML = `✅ زون "${displayName}" ثبت شد. با کلیک روی آن روی نقشه، می‌توانید آن را حذف یا لوکیشن خانه در آن پین کنید.`;
+        document.getElementById('draw-status').innerHTML = `✅ زون "${displayName}" ثبت شد.`;
+        
+        endCustomDrawing();
+        updateZonesList();
     }
 
-    // حذف کامل زون و پاکسازی آن از تمام حافظه سیستم و نقشه
+    // به‌روزرسانی جدول مدیریت و ویرایش زون‌ها
+    function updateZonesList() {
+        let card = document.getElementById('zones-list-card');
+        let tbody = document.getElementById('zones_table').getElementsByTagName('tbody')[0];
+        tbody.innerHTML = '';
+        
+        let keys = Object.keys(USER_ZONES);
+        if(keys.length === 0) {
+            card.style.display = 'none';
+            return;
+        }
+        card.style.display = 'block';
+        
+        keys.forEach(key => {
+            let z = USER_ZONES[key];
+            let row = tbody.insertRow(-1);
+            row.innerHTML = `
+                <td><b>${key}</b></td>
+                <td>${z.parent || 'اصلی'}</td>
+                <td>${z.u_min}-${z.u_max}</td>
+                <td><span style="color:var(--danger); font-weight:bold;">${z.kasbi}</span></td>
+                <td>
+                    <button class="btn" style="padding:4px 8px; font-size:11px; min-height:unset; display:inline-block; width:auto; background:var(--warning);" onclick="loadZoneToEdit('${key}')">✏️ ویرایش</button>
+                    <button class="btn btn-danger" style="padding:4px 8px; font-size:11px; min-height:unset; display:inline-block; width:auto;" onclick="deleteZone('${key}')">🗑️ حذف</button>
+                </td>
+            `;
+        });
+    }
+
+    window.loadZoneToEdit = function(name) {
+        let z = USER_ZONES[name];
+        if(!z) return;
+        document.getElementById('z_name').value = name;
+        document.getElementById('z_name').disabled = true; 
+        document.getElementById('z_parent').value = z.parent || "";
+        document.getElementById('z_color').value = z.layer.options.color;
+        document.getElementById('z_urfi_min').value = z.u_min;
+        document.getElementById('z_urfi_max').value = z.u_max;
+        document.getElementById('z_kasbi').value = z.kasbi;
+        document.getElementById('z_comment').value = z.comment || "";
+        document.getElementById('zone-inputs').style.display = 'block';
+        document.getElementById('save-zone-btn').innerHTML = "🔄 به‌روزرسانی مشخصات زون";
+        document.getElementById('zone-inputs').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
     window.deleteZone = function(zoneName) {
         if(confirm(`آیا از حذف کامل زون [${zoneName}] مطمئن هستید؟`)) {
             map.removeLayer(USER_ZONES[zoneName].layer);
@@ -653,11 +790,11 @@
                 if(leadSelect.options[i].value === zoneName) { leadSelect.remove(i); break; }
             }
             map.closePopup();
-            document.getElementById('draw-status').innerHTML = `❌ زون مدنظر با موفقیت حذف شد.`;
+            updateZonesList();
+            document.getElementById('draw-status').innerHTML = `❌ زون حذف شد.`;
         }
     }
 
-    // الگوریتم ری‌کستینگ برای تشخیص قرارگیری نقطه در چندضلعی زون
     function isPointInPolygon(lat, lon, polyCoords) {
         let inside = false;
         for (let i = 0, j = polyCoords.length - 1; i < polyCoords.length; j = i++) {
@@ -668,7 +805,6 @@
         return inside;
     }
 
-    // ذخیره کامل فایل همراه با تحلیل مکانی زون‌ها و استخراج چک‌باکس‌ها
     function savePropertyFile() {
         let type = document.getElementById('p_type').value;
         let oName = document.getElementById('p_owner_name').value.trim();
@@ -676,14 +812,11 @@
         let area = parseFloat(document.getElementById('p_area').value);
         let price = parseFloat(document.getElementById('p_price').value);
         let specialDesc = document.getElementById('p_special_desc').value.trim();
+        if (!selectedLat || isNaN(price) || !phone || isNaN(area)) { alert("تکمیل فیلدهای اصلی و پین کردن لوکیشن الزامی است."); return; }
 
-        if (!selectedLat || isNaN(price) || !phone || isNaN(area)) { alert("تکمیل فیلدهای شماره تماس، متراژ، قیمت کل و پین کردن لوکیشن روی نقشه الزامی است."); return; }
-
-        let pricePerMeter = (price * 1000) / area; 
-
-        // تشخیص خودکار زون ملک (بررسی زون‌های فرعی/جدیدتر با اولویت بالاتر)
+        let pricePerMeter = (price * 1000) / area;
         let matchedZoneKey = "خارج از زون";
-        let matchedDisplayName = "خارج از محدوده زون‌ب بندی";
+        let matchedDisplayName = "خارج از محدوده زون‌بندی";
         let isDeal = false; let deviation = 0;
 
         let zoneKeys = Object.keys(USER_ZONES).reverse();
@@ -695,14 +828,12 @@
             }
         }
 
-        // استخراج کلیه آیتم‌های تیک خورده در چک باکس‌های داینامیک آن دسته‌بندی
         let checkedCommons = [];
         let section = document.getElementById(`sec_${type}`);
         if(section) {
             section.querySelectorAll('.comm-check:checked').forEach(c => checkedCommons.push(c.value));
         }
 
-        // سنجش سیگنال شکار و اکازیون بودن فایل
         if (USER_ZONES[matchedZoneKey]) {
             let zData = USER_ZONES[matchedZoneKey];
             if (pricePerMeter <= zData.kasbi) isDeal = true;
@@ -716,9 +847,8 @@
         };
         
         properties.push(propertyItem);
-        
-        // تغییر رنگ مارکر بر اساس نوع قیمت (قرمز برای شکار، آبی برای فایل عادی)
         let iconUrl = isDeal ? 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png' : 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png';
+        
         L.marker([selectedLat, selectedLon], {
             icon: L.icon({ iconUrl: iconUrl, shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41] })
         }).addTo(map).bindPopup(`
@@ -730,36 +860,30 @@
                 📝 توضیحات تکمیلی: <span style="font-size:11px; color:#555;">${specialDesc || 'ندارد'}</span>
             </div>
         `);
-
-        alert(`فایل "${type}" کارشناسی شد و در محدوده زون [${matchedDisplayName}] به ثبت رسید.`);
         
-        // ریست فیلدهای فرم ورودی
+        alert(`فایل "${type}" کارشناسی شد و به ثبت رسید.`);
         document.getElementById('p_owner_name').value = '';
         document.getElementById('p_phone').value = '';
         document.getElementById('p_area').value = '';
         document.getElementById('p_price').value = '';
         document.getElementById('p_special_desc').value = '';
-        if(section) {
-            section.querySelectorAll('.comm-check').forEach(c => c.checked = false);
-        }
+        document.getElementById('image-preview').innerHTML = '';
+        document.getElementById('p_images').value = '';
+        if(section) { section.querySelectorAll('.comm-check').forEach(c => c.checked = false); }
 
-        // آپدیت لایو خروجی رادار و تب تطبیق
-        updateRadar(); 
+        updateRadar();
         updateMatching();
     }
 
-    // تب ۲: ثبت خریدار جدید متقاضی املاک
     function addLead() {
         let name = document.getElementById('l_name').value.trim();
         let phone = document.getElementById('l_phone').value.trim();
         let type = document.getElementById('l_type').value;
         let zone = document.getElementById('l_zone').value;
         let budget = parseFloat(document.getElementById('l_budget').value);
-
-        if(!name || !zone || isNaN(budget) || !phone) { alert("لطفاً مشخصات کامل مشتری متقاضی، زون هدف و سقف بودجه خرید را وارد کنید."); return; }
+        if(!name || !zone || isNaN(budget) || !phone) { alert("لطفاً مشخصات کامل مشتری را وارد کنید."); return; }
         leads.push({ name, phone, type, zone, budget });
-        
-        alert(`متقاضی خرید "${name}" ثبت و موتور مچینگ فعال گردید.`);
+        alert(`متقاضی خرید "${name}" ثبت شد.`);
         
         document.getElementById('l_name').value = '';
         document.getElementById('l_phone').value = '';
@@ -767,24 +891,19 @@
         updateMatching();
     }
 
-    // تب ۲: هسته موتور تطبیق هوشمند لایو
     function updateMatching() {
         let box = document.getElementById('matching_box');
         if(leads.length === 0) { box.innerHTML = "هنوز خریدار متقاضی ثبت نشده است."; return; }
         
         let html = "<table><tr><th>خریدار متقاضی</th><th>تلفن تماس</th><th>نوع ملک & زون هدف</th><th>فایل‌های مکانی منطبق کشف شده</th></tr>";
-        
         leads.forEach(l => {
-            // انطباق چندوجهی: هم زون باشد، هم سبک ملک همخوانی داشته باشد و هم قیمت کل کمتر از بودجه خریدار باشد
             let matchedFiles = properties.filter(p => p.zone === l.zone && p.type === l.type && p.totalPrice <= l.budget);
             let fileText = "";
-            
             if(matchedFiles.length > 0) {
                 fileText = matchedFiles.map(f => `🏠 فایل متراژ ${f.area} متری | قیمت کل: ${f.totalPrice} میلیارد (متری ${f.priceMeter} م) <br> 👤 مالک: ${f.owner} - 📞 تماس: <b>${f.phone}</b> <br> <span style="color:var(--accent); font-size:10px;">⚙️ آپشن‌ها: [${f.commons || 'بدون آپشن مشخص'}]</span><br><span style="color:#666; font-size:11px;">📝 توضیحات: ${f.specialDesc}</span>`).join('<hr style="margin:6px 0; border:0; border-top:1px dashed #cbd5e0;">');
             } else {
                 fileText = "<span style='color:var(--danger); font-weight:bold;'>❌ موردی مطابق با بودجه و موقعیت این خریدار یافت نشد.</span>";
             }
-            
             let zName = USER_ZONES[l.zone] ? USER_ZONES[l.zone].displayName : l.zone;
             html += `<tr><td><b>${l.name}</b></td><td>${l.phone}</td><td>زون ${zName} <br> سبک: [${l.type}]</td><td>${fileText}</td></tr>`;
         });
@@ -792,22 +911,18 @@
         box.innerHTML = html;
     }
 
-    // تب ۳: رادار خروجی لایو شکار فرصت‌های املاک زیر قیمت
     function updateRadar() {
         let huntFiles = properties.filter(p => p.isDeal);
         let radarBox = document.getElementById('radar_box');
-        
         if(huntFiles.length === 0) {
             radarBox.innerHTML = "<div style='color:#7f8c8d; text-align:center; padding:20px;'>در حال حاضر فایلی که زیر خط امضا و کاسبی زون باشد ثبت نشده است.</div>";
             return;
         }
-        
         let html = "";
         huntFiles.forEach(h => {
             html += `<div class='hunt-card'>
-                🔥 <b>سیگنال اکازیون شکار بازار:</b> ملک دسته‌بندی <b>[${h.type}]</b> واقع در محدوده <b>${h.zoneDisplay}</b> <br>
-                متراژ: ${h.area} متر | قیمت مالک: متری <span style='color:var(--danger); font-weight:bold;'>${h.priceMeter} میلیون</span> 
-                (${Math.abs(h.dev)}% زیر خط میانگین قیمت نوساز منطقه!) <br>
+                🔥 <b>سیگنال اکازیون شکار بازار:</b> ملک دسته‌ب بندی <b>[${h.type}]</b> واقع در محدوده <b>${h.zoneDisplay}</b> <br>
+                متراژ: ${h.area} متر | قیمت مالک: متری <span style='color:var(--danger); font-weight:bold;'>${h.priceMeter} میلیون</span> (${Math.abs(h.dev)}% زیر خط میانگین قیمت نوساز منطقه!) <br>
                 👤 مالک/فروشنده: ${h.owner} | 📞 تلفن هماهنگی جلسه امضا: <b style="font-size:13px; color:var(--success);">${h.phone}</b> <br>
                 💎 تیک‌های فعال فایل: <span style="color:var(--primary); font-size:11px;">[ ${h.commons || 'بدون ویژگی مشخص'} ]</span><br>
                 📝 توضیحات خاص مشاور: <span style="color:#c0392b; font-size:11px; font-weight:bold;">${h.specialDesc}</span>
@@ -816,69 +931,90 @@
         radarBox.innerHTML = html;
     }
 
-    // تب ۴: بانک اطلاعات سازندگان زاهدان
     function addBuilder() {
         let name = document.getElementById('b_name').value.trim();
         let phone = document.getElementById('b_phone').value.trim();
         let rate = document.getElementById('b_rate').value;
         let desc = document.getElementById('b_desc').value.trim();
         if(!name || !phone) { alert("وارد کردن نام و شماره تلفن مستقیم سازنده الزامی است."); return; }
-        
         let table = document.getElementById('builders_table').getElementsByTagName('tbody')[0];
         let row = table.insertRow(-1);
         row.innerHTML = `<td><b>${name}</b></td><td><b>${phone}</b></td><td><span style='color:#f1c40f;'>${rate}</span></td><td>${desc || 'ثبت نشده'}</td>`;
-        
         document.getElementById('b_name').value = '';
         document.getElementById('b_phone').value = '';
         document.getElementById('b_desc').value = '';
-        alert("اطلاعات سازنده با موفقیت در بانک کارنامه سازندگان ذخیره شد.");
+        alert("اطلاعات سازنده با موفقیت ذخیره شد.");
     }
 
-    // تب ۴: ماتریس هوشمند تهاتر ملک و خودرو
     function addBarter() {
         let from = document.getElementById('t_from').value.trim();
         let val = document.getElementById('t_val').value;
         let phone = document.getElementById('t_phone').value.trim();
         let to = document.getElementById('t_to').value.trim();
-        if(!from || isNaN(parseFloat(val)) || !phone) { alert("اطلاعات معاوضه، ارزش برآورد و شماره تلفن متقاضی را مشخص کنید."); return; }
-        
+        if(!from || isNaN(parseFloat(val)) || !phone) { alert("اطلاعات معاوضه را مشخص کنید."); return; }
         let table = document.getElementById('barter_table').getElementsByTagName('tbody')[0];
         let row = table.insertRow(-1);
         row.innerHTML = `<td>${from}</td><td><span style='color:var(--success); font-weight:bold;'>${val} میلیارد</span></td><td><b>${phone}</b></td><td>${to || 'هر نوع ملک هم ارزش'}</td>`;
-        
         document.getElementById('t_from').value = '';
         document.getElementById('t_val').value = '';
         document.getElementById('t_phone').value = '';
         document.getElementById('t_to').value = '';
-        alert("مورد معاوضه‌ای جدید با موفقیت به ماتریس تهاتر بازار افزوده شد.");
+        alert("مورد معاوضه‌ای جدید به ماتریس افزوده شد.");
     }
 
-    // تب ۵: هوش الگوریتم محاسباتی کسر ضرایب و آپشن‌های ساختمان
+    // ذخیره و مدیریت اطلاعات مدیران ساختمان (جدید)
+    function addBuildingManager() {
+        let name = document.getElementById('m_name').value.trim();
+        let phone = document.getElementById('m_phone').value.trim();
+        let buildings = document.getElementById('m_buildings').value.trim();
+        let notes = document.getElementById('m_notes').value.trim();
+        if(!name || !phone) { alert("وارد کردن نام و شماره تلفن مدیر الزامی است."); return; }
+        let table = document.getElementById('managers_table').getElementsByTagName('tbody')[0];
+        let row = table.insertRow(-1);
+        row.innerHTML = `<td><b>${name}</b></td><td><b>${phone}</b></td><td>${buildings || 'ثبت نشده'}</td><td>${notes || 'ندارد'}</td>`;
+        document.getElementById('m_name').value = '';
+        document.getElementById('m_phone').value = '';
+        document.getElementById('m_buildings').value = '';
+        document.getElementById('m_notes').value = '';
+        alert("مدیر ساختمان با موفقیت ثبت شد.");
+    }
+
+    // ذخیره و مدیریت اطلاعات نگهبانان (جدید)
+    function addGuard() {
+        let name = document.getElementById('g_name').value.trim();
+        let phone = document.getElementById('g_phone').value.trim();
+        let shift = document.getElementById('g_shift').value;
+        let zone = document.getElementById('g_zone').value.trim();
+        if(!name || !phone) { alert("وارد کردن نام و شماره تلفن نگهبان الزامی است."); return; }
+        let table = document.getElementById('guards_table').getElementsByTagName('tbody')[0];
+        let row = table.insertRow(-1);
+        row.innerHTML = `<td><b>${name}</b></td><td><b>${phone}</b></td><td><span style='color:var(--warning); font-weight:bold;'>${shift}</span></td><td>${zone || 'ثبت نشده'}</td>`;
+        document.getElementById('g_name').value = '';
+        document.getElementById('g_phone').value = '';
+        document.getElementById('g_zone').value = '';
+        alert("نگهبان جدید با موفقیت به شبکه حفاظتی افزوده شد.");
+    }
+
     function runAdvancedCalculator() {
         let base = parseFloat(document.getElementById('c_base').value);
         let cab = parseFloat(document.getElementById('c_cab').value);
         let hvac = parseFloat(document.getElementById('c_hvac').value);
-        
-        if (isNaN(base)) { alert("قیمت مبنای عرف نوساز منطقه را به میلیون وارد کنید."); return; }
+        if (isNaN(base)) { alert("قیمت مبنا را وارد کنید."); return; }
 
         let hasParking = document.getElementById('c_parking').checked;
         let hasElevator = document.getElementById('c_elevator').checked;
         let hasStorage = document.getElementById('c_storage').checked;
         let hasTerrace = document.getElementById('c_terrace').checked;
 
-        // کسر ضرایب تجربی بازار زاهدان به ازای نبود امکانات کلیدی سندی
-        if (!hasParking) base = base * 0.90;  // ۱۰٪ کسر ارزش به علت نبود پارکینگ اختصاصی باکس
-        if (!hasElevator) base = base * 0.92; // ۸٪ کسر قیمت برای طبقات بالا بدون آسانسور
-        if (!hasStorage) base = base * 0.97;  // ۳٪ کسر قیمت نبود انباری سندی مستقل
-        if (!hasTerrace) base = base * 0.96;  // ۴٪ کسر قیمت به علت نبود تراس کاربردی
+        if (!hasParking) base = base * 0.90;
+        if (!hasElevator) base = base * 0.92;
+        if (!hasStorage) base = base * 0.97;
+        if (!hasTerrace) base = base * 0.96;
 
-        // کسر مخارج تکمیلی و نصبیات واحدهای خام تحویلی
         let finalPrice = base - (cab + hvac);
-
         let outBox = document.getElementById('calc_output');
         outBox.style.display = "block";
-        outBox.innerHTML = `📐 ارزش واقعی، کارشناسی و مهندسی کارکرد هر متر این ملک در بازار فعلی:<br>
-        <span style="font-size:18px; color:var(--success); font-weight:bold;">متری ${finalPrice.toFixed(2)} میلیون تومان</span>`;
+        outBox.innerHTML = `📐 ارزش واقعی و کارشناسی هر متر این ملک در بازار:<br><span style="font-size:18px; color:var(--success); font-weight:bold;">متری ${finalPrice.toFixed(2)} میلیون تومان</span>`;
     }
 
     function openTab(tabId) {
@@ -886,33 +1022,10 @@
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(tabId).classList.add('active');
         event.currentTarget.classList.add('active');
-        
-        // رندر و ری‌لود نقشه لیروفیت در زمان جابجایی تب جهت برطرف کردن کامل باگ خاکستری شدن نقشه
         if(tabId === 'tab1' && typeof map !== 'undefined') {
             setTimeout(() => map.invalidateSize(), 250);
         }
     }
 </script>
-<script>
-function previewImages() {
-    const preview = document.getElementById('image-preview');
-    const files = document.getElementById('p_images').files;
-    preview.innerHTML = ''; // پاک کردن پیش‌نمایش قبلی
-
-    for (let i = 0; i < files.length; i++) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const img = document.createElement('img');
-            img.src = e.target.result;
-            img.style.width = '80px';
-            img.style.height = '80px';
-            img.style.objectFit = 'cover';
-            img.style.borderRadius = '5px';
-            preview.appendChild(img);
-        }
-        reader.readAsDataURL(files[i]);
-    }
-}
-</script>
 </body>
-</html>
+    </html>
